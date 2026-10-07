@@ -302,7 +302,9 @@ img{max-width:100%}
 .ob h1{font:600 13px var(--body);letter-spacing:.24em;text-transform:uppercase;margin:0 0 30px;color:var(--muted)}
 .ob h2{font:700 32px/1.12 var(--body);letter-spacing:-.025em;margin:0 0 18px;text-wrap:balance}
 .ob .grow{flex:1}
-.ob .foot{display:flex;gap:10px;padding-top:26px}
+.ob .foot{display:flex;gap:10px;padding:26px 0 8px}
+.ob-brand{font:700 15px var(--body)!important;letter-spacing:.28em!important;color:var(--fg)!important;margin:0 0 14px!important}
+.ob-p{margin:0;color:var(--muted);font-size:17px;line-height:1.45;max-width:30ch}
 
 /* radial */
 #radial{position:fixed;inset:0;z-index:30;background:rgba(8,8,9,.88);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);opacity:0;transition:opacity .25s;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 12vh) 16px calc(env(safe-area-inset-bottom,0px) + 30px)}
@@ -978,15 +980,13 @@ async function reorder(kind,ids){
   for(let i=0;i<ids.length;i++){const x=get(ids[i]);if(x&&x.order!==i){x.order=i;await save(x);}}}
 
 /* ================= ONBOARDING ================= */
-V.onboard={nav:false,html(p){const s=S.settings;
-  if(p.step===1){const extra=p.cats.filter(c=>!SUGGESTED_CATS.includes(c));return `<div class="ob"><h1>${esc(s.name)}</h1><h2>What do you want this space to hold?</h2><p class="hint">Choose what feels right. You can rename, add or remove anything later.</p>
-    <div class="chips" style="margin-top:8px">${[...SUGGESTED_CATS,...extra].map(c=>`<button class="chip ${p.cats.includes(c)?'on':''}" data-a="obCat" data-v="${esc(c)}">${CAT_DEF[c]?`<i class="dot" style="--c:${CAT_DEF[c][0]}"></i>`:''}${esc(c)}</button>`).join('')}<button class="chip dashed" data-a="obCustom">+ Create your own</button></div>
-    <div class="grow"></div><div class="foot"><button class="btn" data-a="obNext">${p.cats.length?'Continue':'Skip for now'}</button></div></div>`;}
-  return `<div class="ob"><h1>${esc(s.name)}</h1><h2>Make it yours.</h2>
-   <span class="lbl">Accent</span><div class="swatches">${ACCENTS.map(a=>`<button class="sw ${s.accent===a.c?'on':''}" style="--c:${a.c}" data-a="obSet" data-k="accent" data-v="${a.c}" aria-label="${a.n}"></button>`).join('')}</div>
-   <span class="lbl">Image style</span><div class="seg">${[['soft','Soft'],['round','Round'],['square','Square']].map(([v,l])=>`<button class="${s.corners===v?'on':''}" data-a="obSet" data-k="corners" data-v="${v}">${l}</button>`).join('')}</div>
-   <span class="lbl">On your Home</span><div class="chips">${s.home.map(m=>`<button class="chip ${m.on?'on':''}" data-a="obMod" data-v="${m.type}">${MODS[m.type].label}</button>`).join('')}</div>
-   <div class="grow"></div><div class="foot"><button class="btn ghost" data-a="obBack" style="width:auto;padding:0 22px">Back</button><button class="btn" data-a="obEnter">Enter</button></div></div>`;}};
+const OB_CATS=['Body','Mind','Ritual','Dreams','Beauty','Relationships'];
+V.onboard={nav:false,html(p){
+  if(p.step===2){const extra=p.cats.filter(c=>!OB_CATS.includes(c));return `<div class="ob"><h1>Body Oracle</h1><h2>What would you like to notice?</h2><p class="hint">Choose any, or none.</p>
+    <div class="chips" style="margin-top:10px">${[...OB_CATS,...extra].map(c=>`<button class="chip ${p.cats.includes(c)?'on':''}" data-a="obCat" data-v="${esc(c)}" aria-pressed="${p.cats.includes(c)}">${esc(c)}</button>`).join('')}<button class="chip dashed" data-a="obCustom">+ Something else</button></div>
+    <div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="3">Continue</button></div></div>`;}
+  if(p.step===3)return `<div class="ob"><h1>Body Oracle</h1><div class="grow"></div><h2>You’re ready.</h2><p class="ob-p">You can change everything later.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obEnter">Enter Body Oracle</button></div></div>`;
+  return `<div class="ob"><div class="grow"></div><h1 class="ob-brand">Body Oracle</h1><p class="ob-p">A private space for noticing your body, your life, and what gives it meaning.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="2">Continue</button></div></div>`;}};
 function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracle',accent:'#f2f2f3',cards:'filled',corners:'soft',heroImageId:null,heroText:'A quieter day is still a productive day.',currentIntentionId:null,oracleImages:{},
   home:['hero','states','intention','world','threads','recent','rituals','oracle','body'].map(t=>({type:t,on:t!=='body'})),
   radial:['body','entry:mind','ritual','sign','intention','entry:photo','entry:note'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
@@ -994,7 +994,7 @@ function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracl
   systems:['Breath','Digestion','Skin','Sleep','Energy','Nervous system','Appetite']};}
 async function seed(catNames){const now=Date.now();const items=[];let o=0;const mk=(type,x)=>{const it=Object.assign({id:uid(),type,createdAt:now+(o++),imageId:null},x);items.push(it);return it;};
   catNames.forEach((n,i)=>{const d=CAT_DEF[n];mk('category',{name:n,color:d?d[0]:PALETTE[i%PALETTE.length],icon:d?d[1]:'sign',order:i});});
-  [['Calm','#9fb7a8','Settled, unhurried.'],['Restless','#d9826b','Can’t quite land anywhere.'],['Magnetic','#c46b8f','Drawing things toward me.'],['Creative','#d8b56a','Ideas want out.'],['Withdrawn','#8a8fb0','Turned inward, quieter.'],['Grounded','#a68a6d','Feet on the floor.']].forEach(([n,c,ds],i)=>mk('state',{name:n,color:c,icon:'state',description:ds,order:i}));
+  [['Calm','#9fb7a8','Settled, unhurried.'],['Restless','#d9826b','Can’t quite land anywhere.'],['Heavy','#8a8fb0','Slow, weighted.'],['Creative','#d8b56a','Ideas want out.'],['Magnetic','#c46b8f','Drawing things toward me.'],['Grounded','#a68a6d','Feet on the floor.']].forEach(([n,c,ds],i)=>mk('state',{name:n,color:c,icon:'state',description:ds,order:i}));
   [['My Body','Observations · Patterns · Care','#c98d7c','body'],['Becoming Her','Intentions · Actions · Identity','#d6b46a','sign'],['Manifestation','Desires · Rituals · Signs','#b49ccc','intention'],['Beauty','Self-care · Aesthetics · Style','#d39aa8','flower'],['My Home','Space · Comfort · Environment','#b59a7a','home']].forEach(([n,ds,c,ic])=>mk('thread',{name:n,description:ds,color:c,icon:ic,coverId:null}));
   const R=[['The Cleansing Rite','Cleansing','Release & reset','10–15 min',['Take a warm shower.','Wash slowly, one part of the body at a time.','Imagine the day leaving the body with the water.','Put on clean clothes.','Sit quietly for five minutes.']],
     ['Grounding','Grounding','Reconnect','5 min',['Stand or sit with both feet on the floor.','Name five things you can see.','Breathe out for longer than you breathe in, ten times.','Press your palms together and notice the warmth.']],
@@ -1003,7 +1003,7 @@ async function seed(catNames){const now=Date.now();const items=[];let o=0;const 
     ['Beauty Ritual','Beauty','Self-love','10 min',['Wash your face with warm water.','Apply your skincare slowly, with your hands.','Look at yourself without correcting anything.','Choose one thing you like and say it.']]];
   R.forEach(([n,g,p,du,st],i)=>mk('ritual',{name:n,group:g,purpose:p,duration:du,steps:st,sample:true,order:i,threadId:null,intentionId:null,sigilId:null}));
   const I=[['More freedom','I want more freedom.','I am building a life where I can move freely.'],['More presence','I want to be here, not somewhere in my head.','I return to my body and to the room I am in.'],['More confidence','I want to trust myself more.','I act before I feel completely ready.']];
-  const ints=I.map(([t,de,st])=>mk('intention',{title:t,desire:de,statement:st,actions:[],signsToNotice:[],reflection:'',threadId:null,ritualId:null,sigilId:null}));
+  const ints=I.map(([t,de,st])=>mk('intention',{sample:true,title:t,desire:de,statement:st,actions:[],signsToNotice:[],reflection:'',threadId:null,ritualId:null,sigilId:null}));
   S.settings.currentIntentionId=ints[0].id;
   for(const it of items){S.items.set(it.id,it);}await Promise.all(items.map(it=>DB.put(it).catch(()=>{})));await saveSettings();}
 
@@ -1119,11 +1119,8 @@ const A={
   exportData:()=>exportData(),
   eraseAll:()=>confirmSheet('Erase everything on this device? This cannot be undone.','Erase everything',async()=>{await DB.clear();IMG.forEach(u=>URL.revokeObjectURL(u));IMG.clear();S.items.clear();S.settings=defaultSettings();applyTheme();R.tab='home';R.stack=[{name:'onboard',params:{step:1,cats:[]}}];render();}),
   obCat:t=>{const p=cur().params,v=t.dataset.v;const i=p.cats.indexOf(v);i>=0?p.cats.splice(i,1):p.cats.push(v);render();},
-  obCustom:()=>inputSheet('Create your own','',v=>{const p=cur().params;if(!p.cats.includes(v))p.cats.push(v);render();},{ph:'e.g. Becoming Her, Germany, Night',btn:'Add'}),
-  obNext:()=>{cur().params.step=2;render();},
-  obBack:()=>{cur().params.step=1;render();},
-  obSet:t=>{S.settings[t.dataset.k]=t.dataset.v;applyTheme();render();},
-  obMod:t=>{const m=S.settings.home.find(x=>x.type===t.dataset.v);m.on=!m.on;render();},
+  obCustom:()=>inputSheet('Something else','',v=>{const p=cur().params;if(!p.cats.includes(v))p.cats.push(v);render();},{ph:'e.g. Sleep, Home, Germany',btn:'Add'}),
+  obStep:t=>{cur().params.step=+t.dataset.v;render();},
   obEnter:async()=>{await seed(cur().params.cats);R.stack=[];R.tab='home';render();},
 };
 

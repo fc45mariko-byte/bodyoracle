@@ -155,6 +155,11 @@ img{max-width:100%}
 .tile.sig img{object-fit:contain;padding:12%;box-sizing:border-box}
 .cap{margin:5px 0 0;font-size:12px;color:var(--muted)}
 
+.home-hd{align-items:flex-start;margin-bottom:22px}
+.chips.scroll.flush{margin-bottom:0}
+.add-big{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:var(--r-card);border:1px solid var(--line-2);background:var(--surface);color:var(--fg);font-size:15px;font-weight:500}
+.add-big:active{background:var(--surface-2)}
+
 /* map */
 .mon{margin:26px 0 2px;font:700 22px var(--body);letter-spacing:-.02em}
 .mon:first-child{margin-top:0}
@@ -618,22 +623,30 @@ function newEntryDraft(kind,extra={}){return Object.assign({id:uid(),type:'entry
 function radialIcon(r){if(r.action.startsWith('cat:')){const c=get(r.action.slice(4));return c?c.icon:'sign';}return(RADIAL_TYPES.find(t=>t.action===r.action)||{}).icon||'sign';}
 
 /* ================= HOME ================= */
+/* Progressive discovery: some modules stay out of sight until the person has recorded a few things. */
+const recorded=()=>all('entry').filter(e=>e.kind!=='state').length;
+const UNLOCK={oracle:5,intention:8};
+const activeThread=()=>threadsByRelevance().find(t=>threadCount(t.id)>0);
 Object.assign(MODS,{
-  hero:{label:'Image & words',html(){const s=S.settings,has=s.heroImageId&&IMG.get(s.heroImageId);return `<section class="hero">${slot(s.heroImageId,'settings:heroImageId','4/3')}<button class="hero-q ${has?'on-img':''} ${s.heroText?'':'ph'}" data-a="editHero">${esc(s.heroText||'Write something for today')}</button></section>`;}},
-  states:{label:'How are you?',html(){const st=ordered('state'),t=todayStates();return `<section><div class="sec-h"><h2 class="sec-t">How are you?</h2><button class="lnk" data-a="settingsTab" data-tab="states">Edit</button></div>${st.length?`<div class="chips">${st.map(x=>`<button class="chip ${t.has(x.id)?'on':''}" data-a="logState" data-id="${x.id}" aria-pressed="${t.has(x.id)}"><i class="dot" style="--c:${x.color}"></i>${esc(x.name)}</button>`).join('')}</div>`:`<p class="empty">Create your own states in Settings.</p>`}</section>`;}},
-  intention:{label:'Current intention',html(){const it=get(S.settings.currentIntentionId);
-    if(!it)return `<section class="card mod-int"><div class="mi-t"><p class="eyebrow">Current intention</p><button class="mi-name ph" data-a="new" data-t="intention">Set an intention</button></div></section>`;
+  states:{label:'How are you?',html(){const st=ordered('state'),t=todayStates();if(!st.length)return'';return `<section><div class="sec-h"><h2 class="sec-t">How are you?</h2></div><div class="chips scroll flush">${st.map(x=>`<button class="chip ${t.has(x.id)?'on':''}" data-a="logState" data-id="${x.id}" aria-pressed="${t.has(x.id)}"><i class="dot" style="--c:${x.color}"></i>${esc(x.name)}</button>`).join('')}</div></section>`;}},
+  add:{label:'Add something',html(){return `<button class="add-big" data-a="radial">${ico('plus',20)}<span>Add something</span></button>`;}},
+  recent:{label:'Recent',html(){const es=entries().filter(e=>e.kind!=='state').slice(0,6);return `<section><div class="sec-h"><h2 class="sec-t">Recent</h2>${es.length?`<button class="lnk" data-a="tab" data-t="map">See all</button>`:''}</div>${es.length?`<div class="grid3">${es.map(e=>tile(e)).join('')}</div>`:`<p class="empty">What you add appears here.</p>`}</section>`;}},
+  thread:{label:'Active thread',ready:()=>!!activeThread(),hint:'Appears once a thread holds something',html(){const t=activeThread();if(!t)return'';return `<section><div class="sec-h"><h2 class="sec-t">Active thread</h2><button class="lnk" data-a="tab" data-t="threads">All threads</button></div><div class="list card">${threadRow(t)}</div></section>`;}},
+  intention:{label:'Current intention',ready:()=>{const it=get(S.settings.currentIntentionId);return !!it&&(!it.sample||recorded()>=UNLOCK.intention);},hint:'Appears after a few entries',html(){const it=get(S.settings.currentIntentionId);if(!it)return'';
     return `<section class="card mod-int"><button class="mi-t" data-a="go" data-to="intention" data-p="${jp({id:it.id})}"><p class="eyebrow">Current intention</p><p class="mi-name">${esc(it.title)}</p></button><div class="mi-img">${slot(it.imageId,`item:${it.id}:imageId`,'1/1')}</div></section>`;}},
-  world:{label:'Your world',html(){const cs=ordered('category');if(!cs.length)return'';return `<section><div class="sec-h"><h2 class="sec-t">Your world</h2><button class="lnk" data-a="settingsTab" data-tab="categories">Edit</button></div><div class="hscroll">${cs.map(c=>`<button class="wtile" data-a="mapFilter" data-f="cat:${c.id}"><span class="wimg" style="--c:${c.color}">${imgTag(c.imageId)||ico(c.icon,26)}</span><span class="wname">${esc(c.name)}</span></button>`).join('')}</div></section>`;}},
-  threads:{label:'Active threads',html(){const th=threadsByRelevance().slice(0,4);return `<section><div class="sec-h"><h2 class="sec-t">Active threads</h2><button class="lnk" data-a="tab" data-t="threads">See all</button></div>${th.length?`<div class="list card">${th.map(threadRow).join('')}</div>`:`<p class="empty">No threads yet.</p>`}</section>`;}},
-  recent:{label:'Recent',html(){const es=entries().filter(e=>e.kind!=='state').slice(0,6);return `<section><div class="sec-h"><h2 class="sec-t">Recent</h2>${es.length?`<button class="lnk" data-a="tab" data-t="map">See all</button>`:''}</div>${es.length?`<div class="grid3">${es.map(e=>tile(e,fmt.short(e.date))).join('')}</div>`:`<button class="empty-cta" data-a="radial">Nothing recorded yet. Tap + to add your first entry.</button>`}</section>`;}},
+  oracle:{label:'Oracle',ready:()=>recorded()>=UNLOCK.oracle,hint:'Appears after a few entries',html(){const o=oracleReading();return `<section class="card mod-int"><button class="mi-t" data-a="go" data-to="oracle"><p class="eyebrow">Oracle · a reflection</p><p class="mi-name">${esc(o.noticing?`You’ve been noticing ${o.noticing.toLowerCase()}`:'Something to reflect on')}</p></button><span class="row-i">${ico('oracle',22)}</span></section>`;}},
+  hero:{label:'Image & words',html(){const s=S.settings,has=s.heroImageId&&IMG.get(s.heroImageId);return `<section class="hero">${slot(s.heroImageId,'settings:heroImageId','4/3')}<button class="hero-q ${has?'on-img':''} ${s.heroText?'':'ph'}" data-a="editHero">${esc(s.heroText||'Write something for today')}</button></section>`;}},
+  world:{label:'Your world',html(){const cs=ordered('category');if(!cs.length)return'';return `<section><div class="sec-h"><h2 class="sec-t">Your world</h2></div><div class="hscroll">${cs.map(c=>`<button class="wtile" data-a="mapFilter" data-f="cat:${c.id}"><span class="wimg" style="--c:${c.color}">${imgTag(c.imageId)||ico(c.icon,26)}</span><span class="wname">${esc(c.name)}</span></button>`).join('')}</div></section>`;}},
+  threads:{label:'Threads',html(){const th=threadsByRelevance().slice(0,4);return `<section><div class="sec-h"><h2 class="sec-t">Threads</h2><button class="lnk" data-a="tab" data-t="threads">See all</button></div>${th.length?`<div class="list card">${th.map(threadRow).join('')}</div>`:`<p class="empty">No threads yet.</p>`}</section>`;}},
   rituals:{label:'Rituals',html(){const rs=ordered('ritual').slice(0,6);return `<section><div class="sec-h"><h2 class="sec-t">Rituals</h2><button class="lnk" data-a="go" data-to="rituals">Library</button></div>${rs.length?`<div class="hscroll">${rs.map(r=>`<div class="rcard-h">${ritCard(r)}</div>`).join('')}</div>`:`<p class="empty">No rituals yet.</p>`}</section>`;}},
-  oracle:{label:'Oracle',html(){const today=all('oracle').find(o=>dkey(o.date)===dkey(Date.now()));return `<section class="card mod-int"><button class="mi-t" data-a="go" data-to="oracle"><p class="eyebrow">Oracle</p><p class="mi-name ${today?'':'ph'}" >${today?esc(today.name):"Today's reflection is waiting"}</p>${today?`<p class="row-s">${esc(today.kw)}</p>`:''}</button><span class="row-i">${ico('oracle',26)}</span></section>`;}},
-  body:{label:'Body',html(){const es=entries().filter(e=>e.kind==='body').slice(0,3);return `<section><div class="sec-h"><h2 class="sec-t">Body</h2><button class="lnk" data-a="new" data-t="body">Open body map</button></div>${es.length?`<div class="lines">${es.map(e=>lineRow(e,true)).join('')}</div>`:`<p class="empty">No observations yet.</p>`}</section>`;}},
+  body:{label:'Body',html(){const es=entries().filter(e=>e.kind==='body').slice(0,3);return `<section><div class="sec-h"><h2 class="sec-t">Body</h2><button class="lnk" data-a="new" data-t="body">Open body</button></div>${es.length?`<div class="lines">${es.map(e=>lineRow(e,true)).join('')}</div>`:`<p class="empty">No observations yet.</p>`}</section>`;}},
 });
-V.home={html(){const s=S.settings;const mods=s.home.filter(m=>m.on&&MODS[m.type]).map(m=>MODS[m.type].html()).join('');
-  return `<header class="hd"><div class="hd-main"><h1 class="brand">${esc(s.name||'Body Oracle')}</h1><p class="sub">${fmt.day(Date.now())} <span class="moon" title="${moonName()}" aria-label="${moonName()}">${moonSVG()}</span></p></div><button class="ibtn ring" data-a="go" data-to="oracle" aria-label="Oracle">${ico('oracle')}</button></header>
-  <div class="stack">${mods||`<p class="empty">Your Home is empty. Turn modules on in Edit Home.</p>`}</div><div class="center"><button class="tbtn" data-a="go" data-to="layout">Edit Home</button></div>`;}};
+const HOME_DEFAULT=['states','add','recent','thread','intention','oracle','hero','world','threads','rituals','body'];
+const HOME_ON=new Set(['states','add','recent','thread','intention','oracle']);
+const modVisible=m=>m.on&&MODS[m.type]&&(!MODS[m.type].ready||MODS[m.type].ready());
+V.home={html(){const s=S.settings;const mods=s.home.filter(modVisible).map(m=>MODS[m.type].html()).filter(Boolean).join('');
+  return `<header class="hd home-hd"><div class="hd-main"><h1 class="brand">${esc(s.name||'Body Oracle')}</h1><p class="sub">${fmt.dayLong(Date.now())} <span class="moon" title="${moonName()}" aria-label="${moonName()}">${moonSVG()}</span></p></div></header>
+  <div class="stack">${mods||`<button class="add-big" data-a="radial">${ico('plus',20)}<span>Add something</span></button>`}</div>`;}};
 
 /* ================= MAP ================= */
 const MS={mode:'timeline',filter:'all',ym:null,sel:null};
@@ -944,7 +957,7 @@ const SET={
    <span class="lbl">Image corners</span>${seg('corners',[['soft','Soft'],['round','Round'],['square','Square']])}
    <span class="lbl">Home image & words</span><div style="max-width:220px">${slot(s.heroImageId,'settings:heroImageId','4/3')}</div><input class="field mt" id="s-hero" data-sbind="heroText" value="${esc(s.heroText||'')}" placeholder="A line for your Home">`;},
   layout(){const s=S.settings;return `<h3 class="sub-h" style="margin-top:4px">Home</h3><p class="hint">Drag to reorder. Switch a module off to hide it.</p>
-   <div class="list card sortable" data-sort="home">${s.home.filter(m=>MODS[m.type]).map(m=>`<div class="row srow" data-id="${m.type}"><span class="row-m">${MODS[m.type].label}</span><button class="tog ${m.on?'on':''}" data-a="togMod" data-id="${m.type}" role="switch" aria-checked="${m.on}" aria-label="Show ${MODS[m.type].label}"><i></i></button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}</div>
+   <div class="list card sortable" data-sort="home">${s.home.filter(m=>MODS[m.type]).map(m=>`<div class="row srow" data-id="${m.type}"><span class="row-m"><span class="row-t">${MODS[m.type].label}</span>${MODS[m.type].ready&&!MODS[m.type].ready()?`<span class="row-s">${MODS[m.type].hint}</span>`:''}</span><button class="tog ${m.on?'on':''}" data-a="togMod" data-id="${m.type}" role="switch" aria-checked="${m.on}" aria-label="Show ${MODS[m.type].label}"><i></i></button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}</div>
    <h3 class="sub-h">+ menu</h3><p class="hint">What appears when you tap +. Up to 8 at once. Tap a name to rename or remove it.</p>
    <div class="list card sortable" data-sort="radial">${s.radial.map(r=>`<div class="row srow" data-id="${r.id}"><span class="row-i">${ico(radialIcon(r),18)}</span><button class="row-m btn-plain" data-a="radialItem" data-id="${r.id}">${esc(r.label)}</button><button class="tog ${r.on?'on':''}" data-a="togRadial" data-id="${r.id}" role="switch" aria-checked="${r.on}" aria-label="Show ${esc(r.label)}"><i></i></button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}<button class="row add" data-a="addRadial">${ico('plus',18)} Add to + menu</button></div>`;},
   library(){const s=S.settings;return `<div class="list card">
@@ -988,7 +1001,7 @@ V.onboard={nav:false,html(p){
   if(p.step===3)return `<div class="ob"><h1>Body Oracle</h1><div class="grow"></div><h2>You’re ready.</h2><p class="ob-p">You can change everything later.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obEnter">Enter Body Oracle</button></div></div>`;
   return `<div class="ob"><div class="grow"></div><h1 class="ob-brand">Body Oracle</h1><p class="ob-p">A private space for noticing your body, your life, and what gives it meaning.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="2">Continue</button></div></div>`;}};
 function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracle',accent:'#f2f2f3',cards:'filled',corners:'soft',heroImageId:null,heroText:'A quieter day is still a productive day.',currentIntentionId:null,oracleImages:{},
-  home:['hero','states','intention','world','threads','recent','rituals','oracle','body'].map(t=>({type:t,on:t!=='body'})),
+  v:2,home:HOME_DEFAULT.map(t=>({type:t,on:HOME_ON.has(t)})),
   radial:['body','entry:mind','ritual','sign','intention','entry:photo','entry:note'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
   sensations:['Tension','Pain','Bloating','Warmth','Numbness','Heaviness','Restlessness','Fatigue','Hunger','Tingling','Lightness'],
   systems:['Breath','Digestion','Skin','Sleep','Energy','Nervous system','Appetite']};}
@@ -1136,10 +1149,14 @@ async function exportData(){toast('Preparing backup…');try{const blobs={};for(
 async function importData(f){if(!f)return;let data;try{data=JSON.parse(await f.text());if(data.app!=='body-oracle'||!Array.isArray(data.items))throw 0;}catch(e){toast('That file is not a Body Oracle backup.');return;}
   confirmSheet(`Restore ${plural(data.items.filter(x=>x.type==='entry').length,'entry','entries')} from this backup? What is here now will be replaced.`,'Restore backup',async()=>{
     await DB.clear();IMG.forEach(u=>URL.revokeObjectURL(u));IMG.clear();S.items.clear();
-    for(const x of data.items){S.items.set(x.id,x);await DB.put(x);}S.settings=Object.assign(defaultSettings(),data.settings||{});await saveSettings();
+    for(const x of data.items){S.items.set(x.id,x);await DB.put(x);}S.settings=Object.assign(defaultSettings(),{v:1},data.settings||{});migrateSettings(S.settings);await saveSettings();
     for(const [k,u] of Object.entries(data.blobs||{}))await putBlob(k,dataURLToBlob(u));applyTheme();R.stack=[];R.tab='home';render();toast('Backup restored');});}
 
 /* ================= theme & boot ================= */
+/* v2 redesign: Home and + menu start from the simpler layout; entries, images and lists are untouched. */
+function migrateSettings(s){const d=defaultSettings();for(const k in d)if(s[k]===undefined)s[k]=d[k];
+  if((s.v||1)<2){s.home=d.home;s.radial=d.radial;s.v=2;saveSettings();}
+  const have=new Set(s.home.map(m=>m.type));HOME_DEFAULT.forEach(t=>{if(!have.has(t))s.home.push({type:t,on:false});});}
 function applyTheme(){const s=S.settings,r=document.documentElement;r.style.setProperty('--accent',s.accent);r.style.setProperty('--accent-ink',lum(s.accent)>.42?'#0b0b0c':'#fbfbfb');r.dataset.cards=s.cards;r.dataset.corners=s.corners;}
 function buildNav(){$('#nav').innerHTML=[['home','Home','home'],['map','Map','map'],null,['threads','Threads','threads'],['archive','Archive','archive'],['settings','Settings','settings']].map(x=>x?`<button class="nb" data-a="tab" data-t="${x[0]}">${ico(x[2],22)}<span>${x[1]}</span></button>`:`<button class="nb plus" data-a="radial" aria-label="Add"><span class="pc">${ico('plus',26)}</span></button>`).join('');}
 async function init(){
@@ -1156,7 +1173,7 @@ async function init(){
   try{const items=await DB.all();items.forEach(x=>S.items.set(x.id,x));}catch(e){}
   S.settings=S.items.get('settings')||null;S.items.delete('settings');await loadImages();
   if(!S.settings){S.settings=defaultSettings();R.stack=[{name:'onboard',params:{step:1,cats:[]}}];}
-  else{const d=defaultSettings();for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];}
+  else migrateSettings(S.settings);
   applyTheme();render();
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
   if(window.BO_PWA&&'serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});

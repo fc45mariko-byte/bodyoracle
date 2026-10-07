@@ -288,8 +288,9 @@ img{max-width:100%}
 
 /* oracle */
 .or-img .slot{aspect-ratio:3/2}
-.or-name{margin:22px 0 4px;text-align:center;font:700 24px/1.15 var(--body);letter-spacing:-.02em}
-.or-kw{text-align:center;color:var(--muted);font-size:13.5px;margin:0 0 18px}
+.or-name{margin:6px 0 4px;text-align:left;font:700 24px/1.15 var(--body);letter-spacing:-.02em}
+.or-kw{color:var(--muted);font-size:14px;margin:0 0 22px}
+.or-text,.or-q{margin-top:6px!important}
 .or-text{font:400 18px/1.45 var(--body);margin:0 0 10px}
 .or-q{font:500 17px/1.45 var(--body);color:var(--fg);margin:0 0 18px}
 .or-pat{display:flex;flex-direction:column;gap:6px;margin:8px 0 22px;padding:14px 16px}
@@ -858,7 +859,7 @@ V.thread={html({id}){const t=get(id);if(!t)return head('Not found',{back:true});
   return `${head('',{back:true,right:`<button class="ibtn" data-a="editThread" data-id="${id}" aria-label="Edit thread">${ico('edit',20)}</button>`})}
   <div class="t-cover">${slot(t.coverId,`item:${id}:coverId`,'16/10')}</div>
   <h1 class="t-name">${esc(t.name)}</h1>${t.description?`<p class="muted" style="margin:0">${esc(t.description)}</p>`:''}
-  <p class="stats">${plural(es.length,'entry','entries')} · ${plural(sts.size,'state','states')} · ${plural(ritEntries+rits.length,'ritual','rituals')} · ${plural(ints.length,'intention','intentions')}</p>
+  <p class="stats">${[[es.length,'entry','entries'],[sts.size,'state','states'],[ritEntries+rits.length,'ritual','rituals'],[ints.length,'intention','intentions']].filter(([n],i)=>i===0||n).map(([n,a,b])=>plural(n,a,b)).join(' · ')}</p>
   <button class="btn ghost" data-a="newInThread" data-id="${id}">${ico('plus',18)} Add to this thread</button>
   ${photos.length?`<div class="sec-h mt"><h2 class="sec-t">Images</h2></div><div class="grid3">${photos.map(x=>`<button class="tile" data-a="threadPhoto" data-t="${id}" data-e="${x.e.id}" data-p="${x.p}"><img src="${IMG.get(x.p)}" alt="" loading="lazy">${tdot(entryColor(x.e))}</button>`).join('')}</div>`:''}
   ${ints.length?`<div class="sec-h mt"><h2 class="sec-t">Intentions</h2></div><div class="list card">${ints.map(i=>`<button class="row" data-a="go" data-to="intention" data-p="${jp({id:i.id})}"><span class="row-i">${ico('intention',18)}</span><span class="row-m">${esc(i.title)}</span>${ico('chev',16)}</button>`).join('')}</div>`:''}
@@ -878,7 +879,7 @@ const ARCH_F=[['all','All'],['photos','Photos'],['notes','Notes'],['rituals','Ri
 function archItems(){const out=[];
   entries().forEach(e=>{const cats=(e.categoryIds||[]).map(get).filter(Boolean);out.push({g:{note:'notes',mind:'notes',photo:'notes',ritual:'rituals',sign:'signs',intention:'intentions',body:'body',dream:'dreams',state:'states'}[e.kind]||'notes',e,cats:e.categoryIds||[],date:e.date,img:(e.photoIds||[]).find(id=>IMG.get(id)),title:entryLabel(e),text:[e.text,entryLabel(e),e.tags,e.location,...cats.map(c=>c.name),...(e.stateIds||[]).map(get).filter(Boolean).map(s=>s.name)].join(' '),to:'entry',id:e.id,icon:(KINDS[e.kind]||KINDS.note).icon,color:entryColor(e)});});
   all('sigil').forEach(s=>out.push({g:'sigils',date:s.createdAt,img:s.imageId,title:s.name||'Sigil',text:s.name,to:'sigil',id:s.id,sig:true}));
-  all('oracle').forEach(o=>out.push({g:'oracle',date:o.date,title:o.name,sub:'Oracle',text:o.name+' '+o.kw+' '+o.text,to:'reading',id:o.id,icon:'oracle'}));
+  all('oracle').forEach(o=>out.push({g:'oracle',date:o.date,title:o.noticing||o.name,sub:'Oracle',text:o.name+' '+o.kw+' '+o.text,to:'reading',id:o.id,icon:'oracle'}));
   all('intention').filter(i=>!i.sample).forEach(i=>out.push({g:'intentions',date:i.createdAt,img:i.imageId,title:i.title,sub:'Intention',text:[i.title,i.desire,i.statement,i.reflection].join(' '),to:'intention',id:i.id,icon:'intention'}));
   all('ritual').filter(r=>!r.sample).forEach(r=>out.push({g:'rituals',date:r.createdAt,img:r.imageId,title:r.name,sub:'Ritual',text:[r.name,r.purpose,(r.steps||[]).join(' ')].join(' '),to:'ritual',id:r.id,icon:'ritual'}));
   all('thread').filter(t=>t.coverId||threadCount(t.id)).forEach(t=>out.push({g:'threads',date:t.createdAt,img:t.coverId,title:t.name,sub:'Thread',text:t.name+' '+(t.description||''),to:'thread',id:t.id,icon:'threads'}));
@@ -994,22 +995,22 @@ V.sigil={nav:false,html(p){
 
 /* ================= ORACLE ================= */
 const ARCH={
-  fool:{name:'The Fool',kw:'Beginnings · Openness · First steps',text:'Your world here is still new. There is no pattern yet, only a blank page and the freedom to decide what deserves a place on it.',q:'What would you like to start noticing?',rit:['ground','night']},
-  hermit:{name:'The Hermit',kw:'Rest · Withdrawal · Inner work',text:'Perhaps today asks for less input rather than more effort. A quieter evening can be a way of listening.',q:'What could you let go of tonight?',rit:['night','cleans','rest']},
-  moon:{name:'The Moon',kw:'Uncertainty · Intuition · Night',text:'Not everything needs to be clear yet. Some things are understood slowly, the way eyes adjust to the dark.',q:'What are you sensing that you have not named?',rit:['night','ground']},
-  empress:{name:'The Empress',kw:'Sensuality · Care · Abundance',text:'Your recent entries lean toward pleasure and presence in the body. Care can be its own practice.',q:'What would feel generous toward yourself today?',rit:['beauty','self']},
-  magician:{name:'The Magician',kw:'Making · Will · Resources',text:'You have been creating. The tools are already on the table; the question is where to point them.',q:'What is one thing you could make real this week?',rit:['focus','ground']},
-  temperance:{name:'Temperance',kw:'Balance · Patience · Flow',text:'Steadiness has been appearing in your days. It is less a stillness than a rhythm you can return to.',q:'What keeps you in this rhythm?',rit:['ground','beauty']},
-  chariot:{name:'The Chariot',kw:'Direction · Focus · Momentum',text:'Your entries show focus and movement. Direction matters more than speed.',q:'Where are you actually heading?',rit:['focus','protect']},
-  star:{name:'The Star',kw:'Hope · Renewal · Openness',text:'There is lightness in what you have recorded. Let it be enough without needing a reason.',q:'What are you hoping for, quietly?',rit:['cleans','beauty']},
-  strength:{name:'Strength',kw:'Boundaries · Gentleness · Courage',text:'Protection is showing up as a theme. Strength can be soft and still hold its ground.',q:'Where do you need a clearer boundary?',rit:['protect','ground']},
-  sun:{name:'The Sun',kw:'Warmth · Connection · Joy',text:'You have been around people and warmth. Notice what this gives you, and what it costs.',q:'Who made you feel most like yourself lately?',rit:['beauty','ground']},
-  tower:{name:'The Tower',kw:'Release · Pressure · Change',text:'Your body has recorded a lot of tension lately. Something may want to be put down rather than carried further.',q:'What would loosen if you stopped holding it?',rit:['cleans','release','night']},
-  wheel:{name:'Wheel of Fortune',kw:'Cycles · Change · Return',text:'Your states have been shifting. Change is a pattern too, and it tends to come back around.',q:'What returns, whatever you do?',rit:['ground','night']},
+  fool:{name:'Beginnings',kw:'Beginnings · Openness · First steps',text:'There is no pattern yet, only a blank page and the freedom to decide what deserves a place on it.',q:'What would you like to start noticing?',rit:['ground','night']},
+  hermit:{name:'Rest',kw:'Rest · Withdrawal · Inner work',text:'Perhaps today asks for less input rather than more effort. A quieter evening can be a way of listening.',q:'What could you let go of tonight?',rit:['night','cleans','rest']},
+  moon:{name:'Uncertainty',kw:'Uncertainty · Intuition · Night',text:'Not everything needs to be clear yet. Some things are understood slowly, the way eyes adjust to the dark.',q:'What are you sensing that you have not named?',rit:['night','ground']},
+  empress:{name:'Care',kw:'Sensuality · Care · Abundance',text:'Your recent entries lean toward pleasure and presence in the body. Care can be its own practice.',q:'What would feel generous toward yourself today?',rit:['beauty','self']},
+  magician:{name:'Making',kw:'Making · Will · Resources',text:'You have been creating. The tools are already on the table; the question is where to point them.',q:'What is one thing you could make real this week?',rit:['focus','ground']},
+  temperance:{name:'Balance',kw:'Balance · Patience · Flow',text:'Steadiness has been appearing in your days. It is less a stillness than a rhythm you can return to.',q:'What keeps you in this rhythm?',rit:['ground','beauty']},
+  chariot:{name:'Direction',kw:'Direction · Focus · Momentum',text:'Your entries show focus and movement. Direction matters more than speed.',q:'Where are you actually heading?',rit:['focus','protect']},
+  star:{name:'Hope',kw:'Hope · Renewal · Openness',text:'There is lightness in what you have recorded. Let it be enough without needing a reason.',q:'What are you hoping for, quietly?',rit:['cleans','beauty']},
+  strength:{name:'Boundaries',kw:'Boundaries · Gentleness · Courage',text:'Protection is showing up as a theme. Strength can be soft and still hold its ground.',q:'Where do you need a clearer boundary?',rit:['protect','ground']},
+  sun:{name:'Warmth',kw:'Warmth · Connection · Joy',text:'You have been around people and warmth. Notice what this gives you, and what it costs.',q:'Who made you feel most like yourself lately?',rit:['beauty','ground']},
+  tower:{name:'Release',kw:'Release · Pressure · Change',text:'Your body has recorded a lot of tension lately. Something may want to be put down rather than carried further.',q:'What would loosen if you stopped holding it?',rit:['cleans','release','night']},
+  wheel:{name:'Cycles',kw:'Cycles · Change · Return',text:'Your states have been shifting. Change is a pattern too, and it tends to come back around.',q:'What returns, whatever you do?',rit:['ground','night']},
 };
 const STATE_ARCH={restless:'hermit',withdrawn:'hermit',heavy:'hermit',tired:'hermit',drained:'hermit',uncertain:'moon',anxious:'moon',dreamy:'moon',magnetic:'empress',sensual:'empress',creative:'magician',calm:'temperance',grounded:'temperance',focused:'chariot',expansive:'star',light:'star',hopeful:'star',protected:'strength',social:'sun',joyful:'sun'};
 function oracleReading(){
-  const es=entries().filter(e=>e.date>=Date.now()-14*DAY);const pattern=[];let key;
+  const now=Date.now();const es=entries().filter(e=>e.date>=now-14*DAY);const pattern=[];let key;
   const stc=new Map();es.forEach(e=>(e.stateIds||[]).forEach(id=>{if(get(id))stc.set(id,(stc.get(id)||0)+1);}));const top=[...stc].sort((a,b)=>b[1]-a[1]);const totalSt=[...stc.values()].reduce((a,b)=>a+b,0);
   const body=es.filter(e=>e.kind==='body'&&e.body);const sens=new Map();body.forEach(e=>{const k=`${e.body.sensation||'A sensation'}|${e.body.region||''}`;sens.set(k,(sens.get(k)||0)+1);});const topSens=[...sens].sort((a,b)=>b[1]-a[1])[0];
   const tension=body.filter(e=>/tension|tense|pain|tight|pressure|ache/i.test(e.body.sensation||'')).length;
@@ -1019,23 +1020,30 @@ function oracleReading(){
   else if(top.length)key=STATE_ARCH[get(top[0][0]).name.trim().toLowerCase()]||'wheel';
   else if(es.some(e=>e.kind==='sign'||e.intentionId))key='star';
   else key='temperance';
-  if(top.length){const [id,n]=top[0];const s=get(id);pattern.push(`You have recorded ${s.name.toLowerCase()} ${times(n)} in the last 14 days.`);
+  /* what has been noticed most: a state or a sensation, counted this week, or over two weeks if the week is thin */
+  const count=(fn,since)=>es.filter(e=>e.date>=since&&fn(e)).length;let noticing=null,n=0,when='';
+  const cands=[...top.slice(0,3).map(([id])=>({w:get(id).name,fn:e=>(e.stateIds||[]).includes(id)})),...[...new Set(body.map(e=>e.body.sensation).filter(Boolean))].map(w=>({w,fn:e=>e.kind==='body'&&e.body&&e.body.sensation===w}))];
+  for(const [since,label] of [[now-7*DAY,'this week'],[now-14*DAY,'in the last two weeks']]){const best=cands.map(c=>({c,k:count(c.fn,since)})).sort((a,b)=>b.k-a.k)[0];if(best&&best.k>=2){noticing=best.c.w;n=best.k;when=label;break;}}
+  let reflection='';
+  if(top.length){const [id]=top[0];const s=get(id);
     const days=new Set(es.filter(e=>(e.stateIds||[]).includes(id)).map(e=>dkey(e.date)));
     if(days.size>=2){const cc=new Map();es.forEach(e=>(e.categoryIds||[]).forEach(c=>{if(!get(c))return;const k=dkey(e.date);if(days.has(k)){if(!cc.has(c))cc.set(c,new Set());cc.get(c).add(k);}}));
-      const best=[...cc].sort((a,b)=>b[1].size-a[1].size)[0];if(best&&best[1].size>=2)pattern.push(`On ${best[1].size} of the ${days.size} days you felt ${s.name.toLowerCase()}, you also recorded ${get(best[0]).name}.`);}}
-  if(topSens&&topSens[1]>=2){const [sn,rg]=topSens[0].split('|');pattern.push(`${sn}${rg?` in your ${rg.toLowerCase()}`:''} appeared ${times(topSens[1])}.`);}
+      const best=[...cc].sort((a,b)=>b[1].size-a[1].size)[0];if(best&&best[1].size>=2){reflection=`You seem to notice ${s.name.toLowerCase()} most often on days you also record ${get(best[0]).name.toLowerCase()}.`;pattern.push(`On ${best[1].size} of the ${days.size} days you felt ${s.name.toLowerCase()}, you also recorded ${get(best[0]).name}.`);}}}
+  if(topSens&&topSens[1]>=2){const [sn,rg]=topSens[0].split('|');pattern.push(`${sn}${rg?` in your ${rg.toLowerCase()}`:''} appeared ${times(topSens[1])}.`);if(!reflection&&rg)reflection=`${sn} keeps returning to your ${rg.toLowerCase()}. It may be worth noticing what comes just before it.`;}
   if(!pattern.length)pattern.push(es.length?`You have made ${plural(es.length,'entry','entries')} in the last 14 days.`:'Nothing has been recorded in the last 14 days.');
   const a=ARCH[key];const rs=ordered('ritual');const rit=rs.find(r=>a.rit.some(k=>`${r.name} ${r.purpose||''} ${r.group||''}`.toLowerCase().includes(k)))||rs[0]||null;
-  return{key,name:a.name,kw:a.kw,text:a.text,q:a.q,pattern,ritualId:rit?rit.id:null};}
+  return{key,name:a.name,kw:a.kw,text:reflection||a.text,q:a.q,pattern,noticing,n,when,ritualId:rit?rit.id:null};}
 function readingHTML(o,{saved}){const r=get(o.ritualId);return `
   <div class="or-img">${slot((S.settings.oracleImages||{})[o.key],`smap:oracleImages:${o.key}`,'3/2')}</div>
-  <h2 class="or-name">${esc(o.name)}</h2><p class="or-kw">${esc(o.kw)}</p>
-  <p class="eyebrow">Your current pattern</p><div class="card or-pat">${o.pattern.map(p=>`<p>${esc(p)}</p>`).join('')}</div>
-  <p class="or-text">${esc(o.text)}</p><p class="or-q">${esc(o.q)}</p>
-  ${r?`<p class="eyebrow">Suggested ritual</p><div class="list card" style="margin:8px 0 18px"><button class="row" data-a="go" data-to="ritual" data-p="${jp({id:r.id})}"><span class="thumb" style="width:48px;height:48px">${imgTag(r.imageId)||`<i style="--c:var(--muted)">${ico('candle',20)}</i>`}</span><span class="row-m"><span class="row-t">${esc(r.name)}</span><span class="row-s">${esc([r.duration,r.purpose].filter(Boolean).join(' · '))}</span></span>${ico('chev',16)}</button></div>`:''}
+  <p class="eyebrow mt">${o.noticing?'You’ve been noticing':'A theme'}</p>
+  <h2 class="or-name">${esc(o.noticing||o.name)}</h2><p class="or-kw">${o.noticing?`${esc(times(o.n))} ${esc(o.when)}`:esc(o.kw)}</p>
+  <p class="eyebrow">Reflection</p><p class="or-text">${esc(o.text)}</p>
+  <p class="eyebrow">Question</p><p class="or-q">${esc(o.q)}</p>
+  ${o.pattern&&o.pattern.length?`<div class="card or-pat">${o.pattern.map(p=>`<p>${esc(p)}</p>`).join('')}</div>`:''}
+  ${r?`<p class="eyebrow">If you want a ritual</p><div class="list card" style="margin:8px 0 18px"><button class="row" data-a="go" data-to="ritual" data-p="${jp({id:r.id})}"><span class="thumb" style="width:48px;height:48px">${imgTag(r.imageId)||`<i style="--c:var(--muted)">${ico('candle',20)}</i>`}</span><span class="row-m"><span class="row-t">${esc(r.name)}</span><span class="row-s">${esc([r.duration,r.purpose].filter(Boolean).join(' · '))}</span></span>${ico('chev',16)}</button></div>`:''}
   ${saved}<p class="fine">Drawn only from what you recorded on this device. A reflection, not a prediction or a diagnosis.</p>`;}
-V.oracle={nav:false,quiet:true,html(){const o=oracleReading();const done=all('oracle').find(x=>dkey(x.date)===dkey(Date.now())&&x.key===o.key);
-  return `${head('Your Oracle for Today',{back:true})}${readingHTML(o,{saved:`<button class="btn" data-a="oracleSave" ${done?'disabled':''}>${done?'Saved to today':'Save to today'}</button>`})}`;}};
+V.oracle={nav:false,quiet:true,html(){const o=oracleReading();const done=all('oracle').find(x=>dkey(x.date)===dkey(Date.now())&&x.key===o.key&&x.noticing===o.noticing);
+  return `${head('Oracle',{back:true})}${readingHTML(o,{saved:`<button class="btn" data-a="oracleSave" ${done?'disabled':''}>${done?'Saved to today':'Save to today'}</button>`})}`;}};
 V.reading={quiet:true,html({id}){const o=get(id);if(!o)return head('Not found',{back:true});return `${head(fmt.day(o.date),{back:true})}${readingHTML(o,{saved:''})}<button class="danger-link" data-a="delReading" data-id="${id}">Delete reading</button>`;}};
 
 /* ================= SETTINGS ================= */
@@ -1277,8 +1285,8 @@ async function importData(f){if(!f)return;let data;try{data=JSON.parse(await f.t
 
 /* ================= theme & boot ================= */
 /* v2 redesign: Home and + menu start from the simpler layout; entries, images and lists are untouched. */
-function migrateSettings(s){const d=defaultSettings();for(const k in d)if(s[k]===undefined)s[k]=d[k];
-  if((s.v||1)<2){s.home=d.home;s.radial=d.radial;s.v=2;saveSettings();}
+function migrateSettings(s){const d=defaultSettings();const ver=s.v||1;for(const k in d)if(s[k]===undefined)s[k]=d[k];
+  if(ver<2){s.home=d.home;s.radial=d.radial;s.v=2;saveSettings();}
   const have=new Set(s.home.map(m=>m.type));HOME_DEFAULT.forEach(t=>{if(!have.has(t))s.home.push({type:t,on:false});});}
 function applyTheme(){const s=S.settings,r=document.documentElement;r.style.setProperty('--accent',s.accent);r.style.setProperty('--accent-ink',lum(s.accent)>.42?'#0b0b0c':'#fbfbfb');r.dataset.cards=s.cards;r.dataset.corners=s.corners;}
 function buildNav(){$('#nav').innerHTML=[['home','Home','home'],['map','Map','map'],null,['threads','Threads','threads'],['archive','Archive','archive'],['settings','Settings','settings']].map(x=>x?`<button class="nb" data-a="tab" data-t="${x[0]}">${ico(x[2],22)}<span>${x[1]}</span></button>`:`<button class="nb plus" data-a="radial" aria-label="Add"><span class="pc">${ico('plus',26)}</span></button>`).join('');}

@@ -299,14 +299,15 @@ img{max-width:100%}
 /* body map */
 .bwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:start}
 .bwrap.open{grid-template-columns:minmax(0,1fr) 150px}
-.fig{width:100%;max-width:260px;height:auto;display:block;margin:0 auto}
-.fig .shape{fill:url(#figg);stroke:var(--line-2);stroke-width:.8}
-.hs{cursor:pointer}
-.hs .hit{fill:transparent}
-.hs .dc{fill:var(--accent);opacity:.3;transition:opacity .2s}
-.hs.obs .dc{opacity:.75}
-.hs.sel .dc{opacity:1}
-.hs .halo{fill:none;stroke:var(--accent);stroke-width:1;opacity:.6}
+.fig{width:100%;max-width:240px;height:auto;display:block;margin:0 auto;-webkit-user-select:none;user-select:none}
+.fig .shape{fill:url(#figg);stroke:rgba(255,255,255,.2);stroke-width:.7}
+.fig .anat{fill:none;stroke:rgba(255,255,255,.14);stroke-width:.7;stroke-linecap:round}
+.fig .glow{opacity:.5;animation:glowin .35s ease-out}
+@keyframes glowin{from{opacity:0}}
+.fig .mk-g{opacity:.28;filter:blur(3px)}
+.fig .hs{cursor:pointer;outline:none}
+.fig .hit{fill:transparent}
+.fig .hs:focus-visible .hit{stroke:var(--accent);stroke-width:.8}
 .bpanel{padding:10px 10px 12px;font-size:13px}
 .bp-h{display:flex;align-items:center;justify-content:space-between;font-weight:600;margin-bottom:4px}
 .sens{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;color:var(--muted);padding:6px 2px;font-size:13px;text-align:left}
@@ -488,10 +489,6 @@ const RADIAL_TYPES=[
   {action:'sigil',label:'Sigil',icon:'pen'},
 ];
 const MODS={}; // filled below
-const REGIONS={
-  front:[['Head',100,38],['Neck',100,72],['Chest',100,112],['Stomach',100,162],['Pelvis',100,214],['Arms',37,156],['Arms',163,156],['Hands',27,232],['Hands',173,232],['Legs',81,300],['Legs',119,300],['Feet',80,404],['Feet',120,404]],
-  back:[['Head',100,38],['Neck',100,72],['Shoulders',100,96],['Upper back',100,130],['Lower back',100,182],['Hips',100,218],['Arms',37,156],['Arms',163,156],['Hands',27,232],['Hands',173,232],['Legs',81,300],['Legs',119,300],['Feet',80,404],['Feet',120,404]],
-};
 
 /* ================= storage ================= */
 const DB={db:null,mem:false,mi:new Map(),mb:new Map(),
@@ -634,8 +631,10 @@ function moonSVG(){const p=moonPhase(),r=7,cx=8,cy=8,k=Math.cos(p*2*Math.PI),wax
   return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width=".8" opacity=".5"/><path d="${outer} A${rx} ${r} 0 0 ${inner} ${cx} ${cy-r}Z" fill="currentColor"/></svg>`;}
 
 /* ================= entry helpers ================= */
+const ONE={Arms:'arm',Hands:'hand',Legs:'leg',Feet:'foot',Shoulders:'shoulder'};
+const placeName=b=>!b||!b.region?'':b.side&&ONE[b.region]?`${b.side} ${ONE[b.region]}`:b.region.toLowerCase();
 function entryLabel(e){
-  if(e.kind==='body'){const b=e.body||{};return b.sensation?`${b.sensation}${b.region?` (${b.region.toLowerCase()})`:''}`:(b.region||'Body observation');}
+  if(e.kind==='body'){const b=e.body||{};const pl=placeName(b);return b.sensation?`${b.sensation}${pl?` (${pl})`:''}`:(pl?pl[0].toUpperCase()+pl.slice(1):'Body observation');}
   const t=(e.text||'').trim();if(t)return t.split('\n')[0].slice(0,140);
   if(e.kind==='ritual'&&get(e.ritualId))return get(e.ritualId).name;
   if(e.kind==='state')return(e.stateIds||[]).map(get).filter(Boolean).map(s=>s.name).join(', ')||'State';
@@ -726,7 +725,7 @@ V.entry={html({id}){const e=get(id);if(!e)return head('Not found',{back:true});c
   return `${head('',{back:true,right:`<button class="ibtn" data-a="editEntry" data-id="${e.id}" aria-label="Edit">${ico('edit',20)}</button>`})}
   ${ph.length?`<div class="carousel">${ph.map((pid,i)=>`<div class="car-i ${ph.length===1?'solo':''}">${slot(pid,`item:${e.id}:photoIds:${i}`,'4/5')}</div>`).join('')}</div>`:''}
   <p class="eyebrow e-eb" style="--c:${entryColor(e)}"><i class="dot"></i>${esc(k.label)} · ${fmt.dayLong(e.date)} · ${fmt.time(e.date)}</p>
-  ${b?`<p class="entry-text">${esc(b.sensation||'Observation')}${b.region?` in the ${esc(b.region.toLowerCase())}`:''}</p><p class="muted" style="margin-top:-8px">Intensity ${b.intensity||'–'} of 5${b.view==='back'?' · back':''}</p>`:''}
+  ${b?`<p class="entry-text">${esc(b.sensation||'Observation')}${b.region?` · ${esc(placeName(b))}`:''}</p><p class="muted" style="margin-top:-8px">Intensity ${b.intensity||'–'} of 5${b.view==='back'?' · back':''}</p>`:''}
   ${rit?`<button class="row card" data-a="go" data-to="ritual" data-p="${jp({id:rit.id})}" style="margin:10px 0"><span class="row-i">${ico('ritual',18)}</span><span class="row-m"><span class="row-t">${esc(rit.name)}</span><span class="row-s">${esc(rit.purpose||'')}</span></span>${ico('chev',16)}</button>`:''}
   ${(e.text||'').trim()?`<p class="entry-text accent" style="--c:${ec}">${esc(e.text)}</p>`:(!b&&!rit?`<p class="entry-text">${esc(entryLabel(e))}</p>`:'')}
   <div class="meta">
@@ -764,19 +763,54 @@ V.edit={nav:false,html({draft:d}){const k=KINDS[d.kind]||KINDS.note;const ph=d.p
   <button class="btn mt" data-a="saveEntry">Save</button>`;}};
 
 /* ================= BODY MAP ================= */
-function figureSVG(view,sel,obs){
-  const hs=REGIONS[view].map(([n,x,y])=>`<g class="hs ${sel===n?'sel':''} ${obs.has(n)?'obs':''}" data-a="bodyRegion" data-r="${n}" role="button" aria-label="${n}"><circle class="hit" cx="${x}" cy="${y}" r="15"/>${sel===n?`<circle class="halo" cx="${x}" cy="${y}" r="11"/>`:''}<circle class="dc" cx="${x}" cy="${y}" r="5.5"/></g>`).join('');
-  return `<svg class="fig" viewBox="0 0 200 440" role="img" aria-label="Body map, ${view}"><defs><linearGradient id="figg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-a)"/><stop offset="1" style="stop-color:var(--fig-b)"/></linearGradient></defs>
-  <g class="shape"><ellipse cx="100" cy="38" rx="21" ry="26"/><rect x="91" y="60" width="18" height="24" rx="6"/>
-  <path d="M64 84Q100 72 136 84Q147 90 145 120Q139 160 140 196Q142 222 134 232Q100 246 66 232Q58 222 60 196Q61 160 55 120Q53 90 64 84Z"/>
-  <rect x="40" y="90" width="16" height="130" rx="8" transform="rotate(9 48 90)"/><rect x="144" y="90" width="16" height="130" rx="8" transform="rotate(-9 152 90)"/>
-  <ellipse cx="27" cy="232" rx="8" ry="12" transform="rotate(9 27 232)"/><ellipse cx="173" cy="232" rx="8" ry="12" transform="rotate(-9 173 232)"/>
-  <path d="M67 228Q63 300 70 395L92 395Q97 300 99 238Z"/><path d="M133 228Q137 300 130 395L108 395Q103 300 101 238Z"/>
-  <ellipse cx="80" cy="402" rx="15" ry="7"/><ellipse cx="120" cy="402" rx="15" ry="7"/></g>${hs}</svg>`;}
+/* One half of a standing figure (x>100), head to crotch; mirrored and smoothed into a single outline. */
+const FIG_HALF=[[100,10],[108.5,11],[114.5,15],[118,22],[119.2,31],[118.8,40],[117.2,48],[114.5,55],[110.8,60.5],[108.2,64.5],[108,70],
+  [111,77],[120,81.5],[130,84.5],[139,88],[145,94],[148,103],[149.5,116],[150.5,131],[152,147],[154,162],
+  [157,178],[160,195],[162,210],[163,222],[166,231],[168,244],[167,255],[164,263.5],[159,267.5],[155,264.5],[153,254],[152,240],
+  [151.5,226],[149,206],[145,186],[142,168],[139,150],[136.5,133],[134.5,119],[131.5,109.5],
+  [129.5,117],[128,129],[126,143],[123,157],[122,166],[123,177],[127,190],[131,203],[133,215],[133.5,227],
+  [133,240],[131.5,256],[129.5,273],[127,291],[124.5,307],[123.5,318],[124.5,331],[126,345],[125,361],[122.5,378],[119.5,395],[117.5,407],
+  [119,415.5],[122,423],[123,429.5],[119.5,433],[110.5,433.5],[106,431],[105.5,424],[106,412],[106.5,398],
+  [106,380],[105.5,362],[106,346],[105.5,332],[104.5,320],[104.5,307],[103.5,290],[102.5,268],[101.5,250],[101,239],[100,235]];
+function smoothPath(pts){let d=`M${pts[0][0]} ${pts[0][1]}`;const n=pts.length;
+  for(let i=0;i<n;i++){const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    d+=`C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;}
+  return d+'Z';}
+const FIG_PATH=smoothPath([...FIG_HALF,...FIG_HALF.slice(1,-1).reverse().map(([x,y])=>[200-x,y])]);
+const mir=d=>d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g,(m,x,y)=>`${(200-x).toFixed(1).replace(/\.0$/,'')} ${y}`);
+const both=d=>d+mir(d);
+/* faint anatomical cues so the shape reads as a body, not a mannequin */
+const FIG_LINES={
+  front:both('M104 79Q115 80.5 127 84.5')+both('M105.5 127Q114 133 124.5 127')+'M100 140V158'+both('M112.5 201Q108 211 104 218')+both('M110.5 312Q114.5 316 119 312')+both('M146.5 160Q149 163 152 161'),
+  back:'M100 76V206'+both('M107 97Q120 96 124 108Q121 121 110 121')+both('M104 186Q107 189 110 186')+'M100 212V232'+both('M102 236Q115 241 129 233')+both('M110 322Q114.5 319 119 322'),
+};
+/* Tap areas: [name, side, cx, cy, rx, ry, rotation]. side is the body's own side, so it flips between views. */
+const BODY_AREAS={
+  front:[['Head',null,100,37,21,28,0],['Neck',null,100,73,11,8,0],['Shoulders','left',136,91,12,9,20],['Shoulders','right',64,91,12,9,-20],['Chest',null,100,117,25,16,0],['Stomach',null,100,157,22,19,0],['Pelvis',null,100,206,30,18,0],
+    ['Arms','left',151,160,11,62,-7.5],['Arms','right',49,160,11,62,7.5],['Hands','left',160,248,10,19,-6],['Hands','right',40,248,10,19,6],['Legs','left',116,318,15,90,0],['Legs','right',84,318,15,90,0],['Feet','left',114,423,11,11,0],['Feet','right',86,423,11,11,0]],
+  back:[['Head',null,100,37,21,28,0],['Neck',null,100,73,11,8,0],['Shoulders','right',136,91,12,9,20],['Shoulders','left',64,91,12,9,-20],['Upper back',null,100,118,25,20,0],['Lower back',null,100,170,22,16,0],['Hips',null,100,212,32,18,0],
+    ['Arms','right',151,160,11,62,-7.5],['Arms','left',49,160,11,62,7.5],['Hands','right',160,248,10,19,-6],['Hands','left',40,248,10,19,6],['Legs','right',116,318,15,90,0],['Legs','left',84,318,15,90,0],['Feet','right',114,423,11,11,0],['Feet','left',86,423,11,11,0]],
+};
+const ell=(a,cls,extra='')=>`<ellipse class="${cls}" cx="${a[2]}" cy="${a[3]}" rx="${a[4]}" ry="${a[5]}"${a[6]?` transform="rotate(${a[6]} ${a[2]} ${a[3]})"`:''}${extra}/>`;
+/* sel: {region, side}; marks: Map "Region|side" -> colour of the latest observation there */
+function figureSVG(view,sel,marks,selColor){
+  const areas=BODY_AREAS[view];const isSel=a=>sel&&sel.region===a[0]&&(!a[1]||!sel.side||sel.side===a[1]);
+  const glow=areas.filter(isSel).map(a=>ell(a,'glow',` style="fill:${selColor||'var(--accent)'}"`)).join('');
+  const dots=areas.map(a=>{const c=marks.get(a[0]+'|'+(a[1]||''));return c?`<circle class="mk-g" cx="${a[2]}" cy="${a[3]}" r="9" style="fill:${c}"/><circle class="mk" cx="${a[2]}" cy="${a[3]}" r="3" style="fill:${c}"/>`:'';}).join('');
+  const hits=areas.slice().reverse().map(a=>`<g class="hs" data-a="bodyRegion" data-r="${a[0]}" data-side="${a[1]||''}" role="button" tabindex="0" aria-label="${a[1]?a[1]+' ':''}${a[0]}">${ell(a,'hit')}</g>`).join('');
+  return `<svg class="fig" viewBox="0 0 200 444" role="img" aria-label="Body, ${view}"><defs><linearGradient id="figg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-a)"/><stop offset="1" style="stop-color:var(--fig-b)"/></linearGradient><clipPath id="figc"><path d="${FIG_PATH}"/></clipPath><filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter></defs>
+  <path class="shape" d="${FIG_PATH}"/><g clip-path="url(#figc)"><g filter="url(#soft)">${glow}</g><path class="anat" d="${FIG_LINES[view]}"/></g>${dots}${hits}</svg>`;}
+/* where something was noticed recently: one mark per place, in the colour of the latest observation */
+function bodyMarks(view,skipId){const m=new Map();const areas=BODY_AREAS[view]||[];
+  entries().filter(e=>e.kind==='body'&&e.body&&e.id!==skipId&&(e.body.view||'front')===view&&Date.now()-e.date<30*DAY).forEach(e=>{
+    const pair=areas.filter(a=>a[0]===e.body.region);if(!pair.length)return;const a=pair.find(x=>x[1]===e.body.side)||pair[0];
+    const k=a[0]+'|'+(a[1]||'');if(!m.has(k))m.set(k,entryColor(e));});
+  return m;}
 V.body={nav:false,html({draft:d}){const b=d.body;const isNew=!S.items.has(d.id);const sens=S.settings.sensations;
-  const obs=new Set(all('entry').filter(e=>e.kind==='body'&&e.body&&e.body.view===b.view&&Date.now()-e.date<14*DAY).map(e=>e.body.region));
+  const marks=bodyMarks(b.view,d.id);
   const panel=b.region?`<div class="bpanel card"><div class="bp-h"><span>${esc(b.region)}</span><button class="ibtn sm" data-a="bodyRegion" data-r="" aria-label="Close">${ico('close',15)}</button></div>${sens.map(s=>`<button class="sens ${b.sensation===s?'on':''}" data-a="dset" data-f="body.sensation" data-v="${esc(s)}"><i></i>${esc(s)}</button>`).join('')}<button class="sens" data-a="addSens"><span style="width:9px">+</span>Other…</button><span class="lbl" style="margin:12px 0 4px">Intensity</span><div class="intens">${[1,2,3,4,5].map(n=>`<button class="${b.intensity===n?'on':''}" data-a="dset" data-f="body.intensity" data-v="${n}" data-num="1">${n}</button>`).join('')}</div></div>`:'';
-  const main=b.view==='systems'?`<div><p class="hint">Observations that don't belong to one place.</p><div class="sys">${S.settings.systems.map(s=>`<button class="chip ${b.region===s?'on':''}" data-a="bodyRegion" data-r="${esc(s)}">${esc(s)}</button>`).join('')}<button class="chip dashed" data-a="addSystem">+ Add</button></div></div>`:`<div>${figureSVG(b.view,b.region,obs)}</div>`;
+  const main=b.view==='systems'?`<div><p class="hint">Observations that don't belong to one place.</p><div class="sys">${S.settings.systems.map(s=>`<button class="chip ${b.region===s?'on':''}" data-a="bodyRegion" data-r="${esc(s)}">${esc(s)}</button>`).join('')}<button class="chip dashed" data-a="addSystem">+ Add</button></div></div>`:`<div>${figureSVG(b.view,b.region?{region:b.region,side:b.side}:null,marks,d.color)}</div>`;
   return `${edHead(isNew?'Body':'Edit observation','saveBody')}
   <div class="seg"><button class="${b.view==='front'?'on':''}" data-a="bodyView" data-v="front">Front</button><button class="${b.view==='back'?'on':''}" data-a="bodyView" data-v="back">Back</button><button class="${b.view==='systems'?'on':''}" data-a="bodyView" data-v="systems">Systems</button></div>
   <div class="bwrap ${b.region?'open':''}">${main}${panel}</div>
@@ -1150,7 +1184,7 @@ const A={
   pickSigil:()=>{const d=draft();const items=all('sigil').map(s=>({id:s.id,label:s.name||'Untitled sigil'}));
     pickSheet('Sigil',items,[d.sigilId],false,ids=>{d.sigilId=ids[0]||null;render();},{label:'Draw a new sigil',fn:()=>{const extra={};if(d.type==='intention')extra.intentionId=S.items.has(d.id)?d.id:null;if(d.type==='ritual')extra.ritualId=S.items.has(d.id)?d.id:null;NEW.sigil(extra);cur().params.returnTo='sigilId';}});},
   bodyView:t=>{const b=draft().body;if(b.view!==t.dataset.v){b.view=t.dataset.v;b.region=null;b.sensation=null;}render();},
-  bodyRegion:t=>{const b=draft().body;b.region=t.dataset.r||null;if(!b.region)b.sensation=null;render();},
+  bodyRegion:t=>{const b=draft().body;b.region=t.dataset.r||null;b.side=t.dataset.side||null;if(!b.region)b.sensation=null;render();},
   addSens:()=>inputSheet('New sensation','',async v=>{if(!S.settings.sensations.includes(v))S.settings.sensations.push(v);await saveSettings();draft().body.sensation=v;render();},{ph:'e.g. Pulsing',btn:'Add'}),
   addSystem:()=>inputSheet('New system','',async v=>{if(!S.settings.systems.includes(v))S.settings.systems.push(v);await saveSettings();draft().body.region=v;render();},{ph:'e.g. Cycle',btn:'Add'}),
   threadSort:t=>{TS.sort=t.dataset.v;render();},

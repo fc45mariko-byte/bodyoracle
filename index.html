@@ -239,6 +239,17 @@ img{max-width:100%}
 .sthumb .slot{border-radius:10px}
 .sthumb .slot-plus i{width:24px;height:24px}
 
+.sw.add{background:var(--surface);color:var(--muted);display:grid;place-items:center;box-shadow:inset 0 0 0 1px var(--line-2)}
+.sw-name{margin:8px 0 0;font-size:12px;color:var(--muted);min-height:1em}
+.slot.compact{aspect-ratio:auto!important;height:84px}
+.area.bare{margin-top:14px;min-height:110px}
+.more-t{display:flex;align-items:center;gap:6px;margin:24px 0 0;background:none;border:0;color:var(--muted);font-size:14px;padding:6px 0}
+.more-b{margin-top:6px}
+.more-b .kind-pill{margin-top:4px}
+.cs-row{display:flex;gap:12px;align-items:center}
+.cs-sw{position:relative;width:50px;height:50px;border-radius:50%;background:var(--c);flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.cs-sw input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+
 /* threads */
 .t-cover .slot{aspect-ratio:16/10}
 .t-name{margin:16px 0 4px;font:700 30px/1.1 var(--body);letter-spacing:-.022em;text-wrap:balance}
@@ -403,6 +414,8 @@ const IC={
   close:'<path d="M6 6l12 12M18 6 6 18"/>',
   back:'<path d="M15 5l-7 7 7 7"/>',
   chev:'<path d="M9 5l7 7-7 7"/>',
+  down:'<path d="m6 9 6 6 6-6"/>',
+  up:'<path d="m6 15 6-6 6 6"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/>',
   body:'<circle cx="12" cy="4.5" r="2"/><path d="M12 7.5v6.5M6.5 9.5 12 8l5.5 1.5M9.5 21l2.5-7 2.5 7"/>',
   mind:'<path d="M9.5 4.5A3 3 0 0 0 6.5 7.3 3 3 0 0 0 4.8 12a3 3 0 0 0 1.7 4.7 3 3 0 0 0 3 2.8c1.4 0 2.5-1 2.5-2.5V7c0-1.4-1.1-2.5-2.5-2.5zM14.5 4.5a3 3 0 0 1 3 2.8 3 3 0 0 1 1.7 4.7 3 3 0 0 1-1.7 4.7 3 3 0 0 1-3 2.8c-1.4 0-2.5-1-2.5-2.5"/>',
@@ -442,11 +455,13 @@ const ICON_CHOICES=['body','mind','ritual','intention','sign','note','photo','dr
 
 /* ================= constants ================= */
 const PALETTE=['#c98d7c','#d6b46a','#a9bfa0','#8fa7c4','#b49ccc','#d39aa8','#7f8fb8','#c7a36a','#9fb7a8','#d4875f','#b59a7a','#e0cfa6'];
+/* The person's own colour language. Names are labels only; the app never reads meaning into them. */
+const DEFAULT_PALETTE=[['Rose','#e0a3ad'],['Moss','#8fa883'],['Lavender','#b4a7dc'],['Amber','#e0ad5f'],['Blue','#7fa3d1'],['Cream','#e9dfc8']];
 const ACCENTS=[{n:'White',c:'#f2f2f3'},{n:'Bone',c:'#e6dccb'},{n:'Rose',c:'#d9a5a5'},{n:'Ember',c:'#d4875f'},{n:'Sage',c:'#a9bfa0'},{n:'Lilac',c:'#b9aed6'},{n:'Gold',c:'#d6b46a'}];
 const CAT_DEF={Body:['#c98d7c','body'],Mind:['#9b97c2','mind'],Ritual:['#c7a36a','ritual'],Beauty:['#d39aa8','flower'],Manifestation:['#d8c08f','intention'],Dreams:['#7f8fb8','dream'],Study:['#8fae9b','study'],Relationships:['#c47f8a','heart'],Home:['#b59a7a','home'],Money:['#a8b07a','money'],Travel:['#7fa7b5','plane'],Creativity:['#d1a05f','sign'],Spirituality:['#b49ccc','oracle'],Social:['#d08f6c','people'],Work:['#8d9aa6','note'],Intention:['#e0cfa6','intention'],Night:['#6f7aa6','intention']};
 const SUGGESTED_CATS=['Body','Mind','Ritual','Beauty','Manifestation','Dreams','Study','Relationships','Home','Money','Travel','Creativity','Spirituality','Social','Work'];
 const KINDS={
-  note:{label:'Note',icon:'note',prompt:"What's on your mind?",color:'#b9b0a4'},
+  note:{label:'Note',icon:'note',prompt:"What's happening?",color:'#b9b0a4'},
   mind:{label:'Mind',icon:'mind',prompt:"What's on your mind?",color:'#9b97c2'},
   photo:{label:'Photo',icon:'photo',prompt:'What is this moment?',color:'#b9b0a4'},
   body:{label:'Body',icon:'body',color:'#c98d7c'},
@@ -551,7 +566,7 @@ function parseRef(s){
     makeCover:async()=>{const arr=target[field];const [x]=arr.splice(+idx,1);arr.unshift(x);await persist();},
   };
 }
-function finalizeDraft(d){(d._drop||[]).forEach(dropImage);delete d._new;delete d._drop;return d;}
+function finalizeDraft(d){(d._drop||[]).forEach(dropImage);delete d._new;delete d._drop;delete d._more;delete d._anim;return d;}
 
 /* ================= router ================= */
 const R={tab:'home',stack:[]};
@@ -594,6 +609,13 @@ function inputSheet(title,val,done,{ph='',btn='Save',multiline=false}={}){const 
   m.onclick=e=>{if(e.target.closest('[data-s="x"]'))closeSheet();};
   $('#in-form').onsubmit=e=>{e.preventDefault();const v=$('#in-v').value.trim();closeSheet();if(v||multiline)done(v);};}
 
+/* name + colour sheet, used for palette colours */
+function colorSheet(title,{name,color},done,{onDelete}={}){const m=$('#sheet');m.hidden=false;
+  m.innerHTML=`<div class="sheet-bg" data-s="x"></div><form class="sheet" id="cs-form"><p class="sheet-t">${esc(title)}</p><div class="cs-row"><label class="cs-sw" style="--c:${esc(color)}"><input type="color" id="cs-c" value="${esc(color)}" aria-label="Colour"></label><input class="field" id="cs-n" value="${esc(name||'')}" placeholder="Name it, or leave it" autocomplete="off" enterkeyhint="done"></div><button class="btn" type="submit">Save</button>${onDelete?`<button class="sheet-b danger" type="button" data-s="del">Delete colour</button>`:''}<button class="sheet-b cancel" type="button" data-s="x">Cancel</button></form>`;
+  const c=$('#cs-c');c.oninput=()=>c.parentNode.style.setProperty('--c',c.value);
+  m.onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;if(b.dataset.s==='x')closeSheet();else if(b.dataset.s==='del'){closeSheet();onDelete();}};
+  $('#cs-form').onsubmit=e=>{e.preventDefault();const v={name:$('#cs-n').value.trim(),color:c.value};closeSheet();done(v);};}
+
 /* moon */
 function moonPhase(d=new Date()){const syn=29.530588853;const ref=Date.UTC(2000,0,6,18,14);return((((d-ref)/DAY)%syn)+syn)%syn/syn;}
 function moonName(){const p=moonPhase();return['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'][Math.floor(p*8+.5)%8];}
@@ -610,7 +632,7 @@ function entryLabel(e){
   if(e.kind==='sign'&&get(e.intentionId))return'A sign for '+get(e.intentionId).title;
   const c=(e.categoryIds||[]).map(get).filter(Boolean)[0];if(c)return c.name;
   return(KINDS[e.kind]||KINDS.note).label;}
-function entryColor(e){const s=(e.stateIds||[]).map(get).find(Boolean);if(s)return s.color;const c=(e.categoryIds||[]).map(get).find(Boolean);if(c)return c.color;return(KINDS[e.kind]||KINDS.note).color;}
+function entryColor(e){if(e.color)return e.color;const s=(e.stateIds||[]).map(get).find(Boolean);if(s)return s.color;const c=(e.categoryIds||[]).map(get).find(Boolean);if(c)return c.color;return(KINDS[e.kind]||KINDS.note).color;}
 const kindTag=e=>e.kind==='note'||e.kind==='photo'?'':(KINDS[e.kind]||{}).label||'';
 function tile(e,cap){const ph=(e.photoIds||[]).map(id=>IMG.get(id)).find(Boolean);const k=KINDS[e.kind]||KINDS.note;
   return `<div class="tw"><button class="tile" data-a="go" data-to="entry" data-p="${jp({id:e.id})}">${ph?`<img src="${ph}" alt="">`:`<span class="tile-t">${esc(entryLabel(e))}</span><span class="tile-k" style="--c:${entryColor(e)}">${ico(k.icon,14)}</span>`}</button>${cap?`<p class="cap">${cap}</p>`:''}</div>`;}
@@ -619,7 +641,7 @@ const threadCount=id=>all('entry').filter(e=>(e.threadIds||[]).includes(id)).len
 function threadsByRelevance(){const last=new Map();all('entry').forEach(e=>(e.threadIds||[]).forEach(t=>{if((last.get(t)||0)<e.date)last.set(t,e.date);}));return all('thread').sort((a,b)=>(last.get(b.id)||b.createdAt||0)-(last.get(a.id)||a.createdAt||0));}
 const threadRow=t=>{const n=threadCount(t.id);return `<button class="row" data-a="go" data-to="thread" data-p="${jp({id:t.id})}"><span class="thumb">${imgTag(t.coverId)||`<i style="--c:${t.color}">${ico(t.icon||'threads',20)}</i>`}</span><span class="row-m"><span class="row-t">${esc(t.name)}</span>${t.description?`<span class="row-s">${esc(t.description)}</span>`:''}<span class="row-s">${plural(n,'entry','entries')}</span></span>${ico('chev',18)}</button>`;};
 function todayStates(){const k=dkey(Date.now());const set=new Set();all('entry').forEach(e=>{if(e.kind==='state'&&dkey(e.date)===k)(e.stateIds||[]).forEach(s=>set.add(s));});return set;}
-function newEntryDraft(kind,extra={}){return Object.assign({id:uid(),type:'entry',kind,text:'',date:Date.now(),photoIds:[],categoryIds:[],stateIds:[],threadIds:[],tags:'',location:'',ritualId:null,intentionId:null},extra);}
+function newEntryDraft(kind,extra={}){return Object.assign({id:uid(),type:'entry',kind,text:'',color:null,colorId:null,date:Date.now(),photoIds:[],categoryIds:[],stateIds:[],threadIds:[],tags:'',location:'',ritualId:null,intentionId:null},extra);}
 function radialIcon(r){if(r.action.startsWith('cat:')){const c=get(r.action.slice(4));return c?c.icon:'sign';}return(RADIAL_TYPES.find(t=>t.action===r.action)||{}).icon||'sign';}
 
 /* ================= HOME ================= */
@@ -703,24 +725,30 @@ V.entry={html({id}){const e=get(id);if(!e)return head('Not found',{back:true});c
   ${e.location||e.tags?`<div class="list card mt">${e.location?`<div class="row"><span class="row-i">${ico('location',18)}</span><span class="row-m">${esc(e.location)}</span></div>`:''}${e.tags?`<div class="row"><span class="row-i">${ico('tag',18)}</span><span class="row-m">${esc(e.tags)}</span></div>`:''}</div>`:''}
   <button class="danger-link" data-a="delEntry" data-id="${e.id}">Delete entry</button>`;}};
 
+/* colour row used by every entry editor: the person's palette, tap again to clear */
+function entryColorPicker(d){const pal=S.settings.palette||[];const inPal=pal.some(p=>p.id===d.colorId||(!d.colorId&&p.color===d.color));
+  return `<div class="swatches" role="radiogroup" aria-label="Colour">${pal.map(p=>{const on=d.colorId?d.colorId===p.id:d.color===p.color;return `<button class="sw ${on?'on':''}" style="--c:${p.color}" data-a="pickColor" data-id="${p.id}" role="radio" aria-checked="${on}" aria-label="${esc(p.name)}" title="${esc(p.name)}"></button>`;}).join('')}${d.color&&!inPal?`<button class="sw on" style="--c:${d.color}" data-a="clearColor" aria-label="Current colour, tap to clear"></button>`:''}<button class="sw add" data-a="addPaletteColor" aria-label="Add a colour to your palette">${ico('plus',16)}</button></div>${d.color?`<p class="sw-name">${esc((pal.find(p=>p.id===d.colorId)||{}).name||'')}</p>`:''}`;}
 V.edit={nav:false,html({draft:d}){const k=KINDS[d.kind]||KINDS.note;const ph=d.photoIds||[];const isNew=!S.items.has(d.id);
   const cats=ordered('category'),sts=ordered('state');const thNames=(d.threadIds||[]).map(get).filter(Boolean).map(t=>t.name).join(', ');
   const kname=d.kind==='note'&&(d.categoryIds||[]).length===1&&get(d.categoryIds[0])?get(d.categoryIds[0]).name:k.label;
   return `${edHead(isNew?'New entry':'Edit entry','saveEntry')}
-  <div class="ed-photo">${slot(ph[0],ph.length?'draft:photoIds:0':'draft:photoIds:new','4/3')}</div>
+  <div class="ed-photo">${slot(ph[0],ph.length?'draft:photoIds:0':'draft:photoIds:new','4/3',ph.length?'':'compact')}</div>
   ${ph.length?`<div class="thumbs">${ph.slice(1).map((id,i)=>`<div>${slot(id,`draft:photoIds:${i+1}`,'1/1')}</div>`).join('')}${ph.length<10?`<div>${slot(null,'draft:photoIds:new','1/1')}</div>`:''}</div>`:''}
-  <button class="kind-pill" data-a="pickKind">${ico(k.icon,16)} ${esc(kname)} ${ico('chev',14)}</button>
-  ${d.kind==='ritual'?`<div class="list card" style="margin-bottom:10px">${rowBtn('ritual','Ritual',get(d.ritualId)?.name||'Choose','pickOne','data-f="ritualId" data-type="ritual" data-title="Which ritual?"')}</div>`:''}
-  <textarea class="field area" id="ed-text" data-bind="text" placeholder="${esc(k.prompt||"What's on your mind?")}">${esc(d.text||'')}</textarea>
-  <span class="lbl">Categories</span><div class="chips">${cats.map(c=>`<button class="chip ${(d.categoryIds||[]).includes(c.id)?'on':''}" data-a="tog" data-f="categoryIds" data-v="${c.id}"><i class="dot" style="--c:${c.color}"></i>${esc(c.name)}</button>`).join('')}<button class="chip dashed" data-a="newCatInline">+ Custom…</button></div>
-  <span class="lbl">States</span><div class="chips">${sts.map(s=>`<button class="chip ${(d.stateIds||[]).includes(s.id)?'on':''}" data-a="tog" data-f="stateIds" data-v="${s.id}"><i class="dot" style="--c:${s.color}"></i>${esc(s.name)}</button>`).join('')}<button class="chip dashed" data-a="newStateInline">+ New state</button></div>
-  <div class="list card mt">
+  ${d.kind==='ritual'?`<div class="list card" style="margin-top:12px">${rowBtn('ritual','Ritual',get(d.ritualId)?.name||'Choose','pickOne','data-f="ritualId" data-type="ritual" data-title="Which ritual?"')}</div>`:''}
+  <textarea class="field area bare" id="ed-text" data-bind="text" placeholder="${esc(k.prompt||"What's happening?")}">${esc(d.text||'')}</textarea>
+  <span class="lbl">Colour</span>${entryColorPicker(d)}
+  ${sts.length?`<span class="lbl">State</span><div class="chips">${sts.map(s=>`<button class="chip ${(d.stateIds||[]).includes(s.id)?'on':''}" data-a="tog" data-f="stateIds" data-v="${s.id}"><i class="dot" style="--c:${s.color}"></i>${esc(s.name)}</button>`).join('')}<button class="chip dashed" data-a="newStateInline" aria-label="New state">+</button></div>`:''}
+  <span class="lbl">Category</span><div class="chips">${cats.map(c=>`<button class="chip ${(d.categoryIds||[]).includes(c.id)?'on':''}" data-a="tog" data-f="categoryIds" data-v="${c.id}">${esc(c.name)}</button>`).join('')}<button class="chip dashed" data-a="newCatInline">${cats.length?'+':'+ Add a category'}</button></div>
+  <button class="more-t" data-a="togMore" aria-expanded="${!!d._more}">More ${ico(d._more?'up':'down',14)}</button>
+  ${d._more?`<div class="more-b"><button class="kind-pill" data-a="pickKind">${ico(k.icon,16)} ${esc(kname)} ${ico('chev',14)}</button>
+  <div class="list card">
    <label class="row"><span class="row-i">${ico('clock',18)}</span><span class="row-m">Date</span><input type="datetime-local" class="dt" id="ed-date" data-bind="date" value="${toLocalInput(d.date)}"></label>
-   ${rowBtn('threads','Add to thread',thNames||'None','pickThreads')}
+   ${rowBtn('threads','Thread',thNames||'None','pickThreads')}
    ${rowBtn('intention','Intention',get(d.intentionId)?.title||'None','pickOne','data-f="intentionId" data-type="intention" data-title="Link to an intention"')}
    <label class="row"><span class="row-i">${ico('location',18)}</span><span class="row-m">Location</span><input class="inl" id="ed-loc" data-bind="location" value="${esc(d.location||'')}" placeholder="None"></label>
    <label class="row"><span class="row-i">${ico('tag',18)}</span><span class="row-m">Tags</span><input class="inl" id="ed-tags" data-bind="tags" value="${esc(d.tags||'')}" placeholder="Add tags"></label>
-  </div>`;}};
+  </div></div>`:''}
+  <button class="btn mt" data-a="saveEntry">Save</button>`;}};
 
 /* ================= BODY MAP ================= */
 function figureSVG(view,sel,obs){
@@ -1001,6 +1029,7 @@ V.onboard={nav:false,html(p){
   if(p.step===3)return `<div class="ob"><h1>Body Oracle</h1><div class="grow"></div><h2>You’re ready.</h2><p class="ob-p">You can change everything later.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obEnter">Enter Body Oracle</button></div></div>`;
   return `<div class="ob"><div class="grow"></div><h1 class="ob-brand">Body Oracle</h1><p class="ob-p">A private space for noticing your body, your life, and what gives it meaning.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="2">Continue</button></div></div>`;}};
 function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracle',accent:'#f2f2f3',cards:'filled',corners:'soft',heroImageId:null,heroText:'A quieter day is still a productive day.',currentIntentionId:null,oracleImages:{},
+  palette:DEFAULT_PALETTE.map(([name,color])=>({id:uid(),name,color})),
   v:2,home:HOME_DEFAULT.map(t=>({type:t,on:HOME_ON.has(t)})),
   radial:['body','entry:note','entry:photo','ritual','intention','state'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
   sensations:['Tension','Pain','Bloating','Warmth','Numbness','Heaviness','Restlessness','Fatigue','Hunger','Tingling','Lightness'],
@@ -1072,6 +1101,10 @@ const A={
     finalizeDraft(d);await save(d);R.stack.pop();render();toast('Saved');},
   saveBody:async()=>{const d=draft();if(!d.body.region){toast('Tap a place on the body first.');return;}finalizeDraft(d);await save(d);R.stack.pop();render();toast('Observation saved');},
   cancelDraft:()=>{const d=draft();if(d)(d._new||[]).forEach(dropImage);if(cur().name==='sigil'){SG.buf=null;SG.hist=[];}back();},
+  togMore:()=>{const d=draft();d._more=!d._more;render();},
+  pickColor:t=>{const d=draft();const p=(S.settings.palette||[]).find(x=>x.id===t.dataset.id);if(!p)return;if(d.colorId===p.id||(!d.colorId&&d.color===p.color)){d.color=null;d.colorId=null;}else{d.color=p.color;d.colorId=p.id;}render();},
+  clearColor:()=>{const d=draft();d.color=null;d.colorId=null;render();},
+  addPaletteColor:()=>colorSheet('New colour',{name:'',color:'#c9a0dc'},async p=>{const x={id:uid(),name:p.name||'Colour',color:p.color};S.settings.palette.push(x);await saveSettings();const d=draft();if(d&&'color' in d){d.color=x.color;d.colorId=x.id;}render();}),
   pickKind:()=>{const ks=['note','mind','sign','dream','ritual','photo'];sheet(ks.map(k=>({label:KINDS[k].label,fn:()=>{draft().kind=k;render();}})),'Kind of entry');},
   tog:t=>{const d=draft(),f=t.dataset.f,v=t.dataset.v;const a=d[f]=d[f]||[];const i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);render();},
   dset:t=>{const d=draft();let v=t.dataset.v;if(t.dataset.num)v=+v;setPath(d,t.dataset.f,v);render();},

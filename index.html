@@ -37,6 +37,8 @@ img{max-width:100%}
 
 #app{position:fixed;top:0;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg)}
 #main{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 10px) 18px 36px}
+#main.enter{animation:vin .22s ease-out}
+@keyframes vin{from{opacity:.4;transform:translateY(6px)}}
 #main.quiet{background:radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 70%),var(--bg)}
 
 /* bottom bar */
@@ -66,7 +68,7 @@ img{max-width:100%}
 .center{display:flex;justify-content:center;margin-top:18px}
 
 /* sections */
-.stack{display:flex;flex-direction:column;gap:26px}
+.stack{display:flex;flex-direction:column;gap:28px}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
 .sec-t{margin:0;font:600 12px/1.2 var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .sub-h{margin:26px 0 6px;font:600 12px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
@@ -103,7 +105,8 @@ img{max-width:100%}
 .chips.scroll{flex-wrap:nowrap;overflow-x:auto;margin:0 -18px 16px;padding:0 18px;scrollbar-width:none}
 .chips.scroll::-webkit-scrollbar{display:none}
 .chips.sm .chip{height:26px;font-size:12px;padding:0 10px}
-.chip{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--fg);font-size:13.5px;white-space:nowrap;flex:none}
+.chip{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--fg);font-size:13.5px;white-space:nowrap;flex:none;transition:background .15s,color .15s,border-color .15s}
+.chip:active{transform:scale(.97)}
 .chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip.dashed{border-style:dashed;color:var(--muted)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--c,var(--accent));flex:none;display:inline-block}
@@ -223,7 +226,10 @@ img{max-width:100%}
 .ce-top .lbl{margin-top:0}
 .swatches{display:flex;flex-wrap:wrap;gap:10px}
 .sw{width:34px;height:34px;border-radius:50%;background:var(--c);border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);position:relative;padding:0}
+.sw{transition:box-shadow .15s,transform .15s}
+.sw:active{transform:scale(.92)}
 .sw.on{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--fg)}
+.bsheet .sw.on{box-shadow:0 0 0 2px var(--surface-2),0 0 0 3.5px var(--fg)}
 .sw.custom{background:conic-gradient(#d98a7a,#d8c08f,#a9bfa0,#8fa7c4,#b49ccc,#d98a7a);display:block;overflow:hidden}
 .sw.custom input{opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
 .icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px}
@@ -594,7 +600,7 @@ const V={};
 function render(){
   const c=cur();const view=V[c.name]||V.home;const main=$('#main');const key=c.name+'|'+R.stack.length;const same=main.dataset.k===key;const st=main.scrollTop;
   main.innerHTML=(DB.mem?`<p class="banner">This browser window can't store data, so entries will disappear when it closes. Open the app from your Home Screen to keep them.</p>`:'')+view.html(c.params||{});
-  main.dataset.k=key;main.className=view.quiet?'quiet':'';main.scrollTop=same?st:0;
+  main.dataset.k=key;main.className=(view.quiet?'quiet':'')+(same?'':' enter');main.scrollTop=same?st:0;
   $('#nav').hidden=view.nav===false;
   $$('#nav .nb[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===R.tab));
   view.after&&view.after(c.params||{});

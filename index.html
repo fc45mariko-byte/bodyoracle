@@ -297,8 +297,10 @@ img{max-width:100%}
 .fine{font-size:12px;color:var(--faint);text-align:center;margin:16px 0 0}
 
 /* body map */
-.bwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:start}
-.bwrap.open{grid-template-columns:minmax(0,1fr) 150px}
+.bwrap{display:block;padding:6px 0 0}
+.sys-wrap{min-height:200px;padding-top:6px}
+.b-hint{text-align:center;margin-top:12px}
+.bs-space{height:60vh}
 .fig{width:100%;max-width:240px;height:auto;display:block;margin:0 auto;-webkit-user-select:none;user-select:none}
 .fig .shape{fill:url(#figg);stroke:rgba(255,255,255,.2);stroke-width:.7}
 .fig .anat{fill:none;stroke:rgba(255,255,255,.14);stroke-width:.7;stroke-linecap:round}
@@ -308,16 +310,22 @@ img{max-width:100%}
 .fig .hs{cursor:pointer;outline:none}
 .fig .hit{fill:transparent}
 .fig .hs:focus-visible .hit{stroke:var(--accent);stroke-width:.8}
-.bpanel{padding:10px 10px 12px;font-size:13px}
-.bp-h{display:flex;align-items:center;justify-content:space-between;font-weight:600;margin-bottom:4px}
-.sens{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;color:var(--muted);padding:6px 2px;font-size:13px;text-align:left}
-.sens i{width:9px;height:9px;border-radius:50%;border:1px solid var(--muted);flex:none}
-.sens.on{color:var(--fg)}
-.sens.on i{background:var(--accent);border-color:var(--accent)}
-.intens{display:flex;gap:6px;margin-top:4px}
-.intens button{flex:1;height:26px;border-radius:8px;border:1px solid var(--line-2);background:none;color:var(--muted);font-size:12px;padding:0}
+.intens{display:flex;gap:6px}
+.intens button{flex:1;height:36px;border-radius:10px;border:1px solid var(--line-2);background:none;color:var(--muted);font-size:14px;padding:0;font-variant-numeric:tabular-nums}
 .intens button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .sys{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+
+.bsheet-bg{position:fixed;inset:0;z-index:19;pointer-events:none;background:linear-gradient(transparent 35%,rgba(0,0,0,.45))}
+.bsheet{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;max-height:58%;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;background:var(--surface-2);border-radius:20px 20px 0 0;border-top:1px solid var(--line);padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 16px);box-shadow:0 -12px 40px rgba(0,0,0,.45)}
+.bsheet.anim{animation:up .26s cubic-bezier(.2,.85,.25,1)}
+.bsheet::before{content:'';display:block;width:36px;height:4px;border-radius:2px;background:var(--line-2);margin:0 auto 8px}
+.bs-hd{display:flex;align-items:center;justify-content:space-between}
+.bs-t{margin:0;font:600 13px var(--body);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.bs-t::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--c);display:block}
+.bsheet .lbl{margin:18px 0 8px}
+.bsheet .lbl.bs-l{margin-top:10px}
+.bsheet .chips{gap:6px}
+.bsheet .chip{height:32px;font-size:13px}
 
 /* sigil canvas */
 .sig-cv{display:block;width:100%;max-width:100%;aspect-ratio:1;background:var(--surface);border-radius:var(--r-card);touch-action:none}
@@ -807,21 +815,35 @@ function bodyMarks(view,skipId){const m=new Map();const areas=BODY_AREAS[view]||
     const pair=areas.filter(a=>a[0]===e.body.region);if(!pair.length)return;const a=pair.find(x=>x[1]===e.body.side)||pair[0];
     const k=a[0]+'|'+(a[1]||'');if(!m.has(k))m.set(k,entryColor(e));});
   return m;}
-V.body={nav:false,html({draft:d}){const b=d.body;const isNew=!S.items.has(d.id);const sens=S.settings.sensations;
-  const marks=bodyMarks(b.view,d.id);
-  const panel=b.region?`<div class="bpanel card"><div class="bp-h"><span>${esc(b.region)}</span><button class="ibtn sm" data-a="bodyRegion" data-r="" aria-label="Close">${ico('close',15)}</button></div>${sens.map(s=>`<button class="sens ${b.sensation===s?'on':''}" data-a="dset" data-f="body.sensation" data-v="${esc(s)}"><i></i>${esc(s)}</button>`).join('')}<button class="sens" data-a="addSens"><span style="width:9px">+</span>Other…</button><span class="lbl" style="margin:12px 0 4px">Intensity</span><div class="intens">${[1,2,3,4,5].map(n=>`<button class="${b.intensity===n?'on':''}" data-a="dset" data-f="body.intensity" data-v="${n}" data-num="1">${n}</button>`).join('')}</div></div>`:'';
-  const main=b.view==='systems'?`<div><p class="hint">Observations that don't belong to one place.</p><div class="sys">${S.settings.systems.map(s=>`<button class="chip ${b.region===s?'on':''}" data-a="bodyRegion" data-r="${esc(s)}">${esc(s)}</button>`).join('')}<button class="chip dashed" data-a="addSystem">+ Add</button></div></div>`:`<div>${figureSVG(b.view,b.region?{region:b.region,side:b.side}:null,marks,d.color)}</div>`;
-  return `${edHead(isNew?'Body':'Edit observation','saveBody')}
+let BODY_SCROLL=0;
+V.body={nav:false,html({draft:d}){const b=d.body;const isNew=!S.items.has(d.id);const sens=S.settings.sensations;const sts=ordered('state');
+  const marks=bodyMarks(b.view,d.id);const place=placeName(b);
+  const main=b.view==='systems'?`<div class="sys-wrap"><p class="hint">Things you notice that don’t belong to one place.</p><div class="chips">${S.settings.systems.map(x=>`<button class="chip ${b.region===x?'on':''}" data-a="bodyRegion" data-r="${esc(x)}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addSystem">+ Add</button></div></div>`:figureSVG(b.view,b.region?{region:b.region,side:b.side}:null,marks,d.color);
+  const recent=entries().filter(e=>e.kind==='body'&&e.id!==d.id).slice(0,3);
+  const sheetHTML=b.region?`<div class="bsheet-bg" aria-hidden="true"></div>
+  <section class="bsheet ${d._anim?'anim':''}" role="dialog" aria-label="${esc(place)}">
+   <div class="bs-hd"><h2 class="bs-t" style="--c:${d.color||'transparent'}">${esc(place)}</h2><button class="ibtn sm" data-a="bodyRegion" data-r="" aria-label="Close">${ico('close',16)}</button></div>
+   <span class="lbl bs-l">How does it feel?</span><div class="chips">${sens.map(x=>`<button class="chip ${b.sensation===x?'on':''}" data-a="bodySens" data-v="${esc(x)}" aria-pressed="${b.sensation===x}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addSens">+ Something else</button></div>
+   <span class="lbl">Intensity</span><div class="intens" role="radiogroup" aria-label="Intensity">${[1,2,3,4,5].map(n=>`<button class="${b.intensity===n?'on':''}" data-a="dset" data-f="body.intensity" data-v="${n}" data-num="1" role="radio" aria-checked="${b.intensity===n}">${n}</button>`).join('')}</div>
+   <span class="lbl">What do you notice?</span><textarea class="field area sm" id="body-note" data-bind="text" placeholder="In your own words">${esc(d.text||'')}</textarea>
+   ${sts.length?`<span class="lbl">State</span><div class="chips">${sts.map(x=>`<button class="chip ${(d.stateIds||[]).includes(x.id)?'on':''}" data-a="tog" data-f="stateIds" data-v="${x.id}"><i class="dot" style="--c:${x.color}"></i>${esc(x.name)}</button>`).join('')}</div>`:''}
+   <span class="lbl">Colour</span>${entryColorPicker(d)}
+   <button class="more-t" data-a="togMore" aria-expanded="${!!d._more}">More ${ico(d._more?'up':'down',14)}</button>
+   ${d._more?`<div class="more-b"><div class="list card">
+    <label class="row"><span class="row-i">${ico('clock',18)}</span><span class="row-m">Date</span><input type="datetime-local" class="dt" id="body-date" data-bind="date" value="${toLocalInput(d.date)}"></label>
+    ${rowBtn('threads','Thread',(d.threadIds||[]).map(get).filter(Boolean).map(t=>t.name).join(', ')||'None','pickThreads')}
+   </div><span class="lbl">Image</span><div style="max-width:140px">${slot((d.photoIds||[])[0],(d.photoIds||[]).length?'draft:photoIds:0':'draft:photoIds:new','1/1')}</div></div>`:''}
+   <button class="btn mt" data-a="saveBody">Save observation</button>
+  </section>`:'';
+  return `<header class="ed-hd"><button class="tbtn" data-a="cancelDraft">${isNew?'Cancel':'Back'}</button><span class="ed-t">${isNew?'Body':'Edit observation'}</span><span style="width:60px"></span></header>
   <div class="seg"><button class="${b.view==='front'?'on':''}" data-a="bodyView" data-v="front">Front</button><button class="${b.view==='back'?'on':''}" data-a="bodyView" data-v="back">Back</button><button class="${b.view==='systems'?'on':''}" data-a="bodyView" data-v="systems">Systems</button></div>
-  <div class="bwrap ${b.region?'open':''}">${main}${panel}</div>
-  ${b.region?'':`<p class="hint" style="text-align:center;margin-top:10px">Tap a place to record what you notice there.</p>`}
-  <span class="lbl">Notes</span><textarea class="field area sm" id="body-note" data-bind="text" placeholder="What do you notice?">${esc(d.text||'')}</textarea>
-  <span class="lbl">States</span><div class="chips">${ordered('state').map(s=>`<button class="chip ${(d.stateIds||[]).includes(s.id)?'on':''}" data-a="tog" data-f="stateIds" data-v="${s.id}"><i class="dot" style="--c:${s.color}"></i>${esc(s.name)}</button>`).join('')}</div>
-  <div class="list card mt">
-   <label class="row"><span class="row-i">${ico('clock',18)}</span><span class="row-m">Date</span><input type="datetime-local" class="dt" id="body-date" data-bind="date" value="${toLocalInput(d.date)}"></label>
-   ${rowBtn('threads','Add to thread',(d.threadIds||[]).map(get).filter(Boolean).map(t=>t.name).join(', ')||'None','pickThreads')}
-  </div>
-  <span class="lbl">Image</span><div style="max-width:160px">${slot((d.photoIds||[])[0],(d.photoIds||[]).length?'draft:photoIds:0':'draft:photoIds:new','1/1')}</div>`;}};
+  <div class="bwrap">${main}</div>
+  <p class="hint b-hint">${b.view==='systems'?'':'Tap where you notice something.'}</p>${b.region?'<div class="bs-space"></div>':''}
+  ${recent.length?`<div class="sec-h mt"><h2 class="sec-t">Recently noticed</h2></div><div class="lines">${recent.map(e=>lineRow(e,true)).join('')}</div>`:''}
+  ${sheetHTML}`;},
+  after({draft:d}){const sh=$('.bsheet');const fresh=d._anim;delete d._anim;if(!sh)return;sh.scrollTop=BODY_SCROLL;sh.onscroll=()=>{BODY_SCROLL=sh.scrollTop;};
+    /* keep the chosen place in view above the sheet */
+    const g=$('.fig .glow');if(fresh&&g){const main=$('#main');const r=g.getBoundingClientRect(),top=sh.getBoundingClientRect().top;const want=top/2+20;const dy=(r.top+r.height/2)-want;if(Math.abs(dy)>20)main.scrollBy({top:dy,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});}}};
 
 /* ================= THREADS ================= */
 const TS={sort:'rel'};
@@ -990,7 +1012,7 @@ function oracleReading(){
   const es=entries().filter(e=>e.date>=Date.now()-14*DAY);const pattern=[];let key;
   const stc=new Map();es.forEach(e=>(e.stateIds||[]).forEach(id=>{if(get(id))stc.set(id,(stc.get(id)||0)+1);}));const top=[...stc].sort((a,b)=>b[1]-a[1]);const totalSt=[...stc.values()].reduce((a,b)=>a+b,0);
   const body=es.filter(e=>e.kind==='body'&&e.body);const sens=new Map();body.forEach(e=>{const k=`${e.body.sensation||'A sensation'}|${e.body.region||''}`;sens.set(k,(sens.get(k)||0)+1);});const topSens=[...sens].sort((a,b)=>b[1]-a[1])[0];
-  const tension=body.filter(e=>/tension|pain|tight|pressure|ache/i.test(e.body.sensation||'')).length;
+  const tension=body.filter(e=>/tension|tense|pain|tight|pressure|ache/i.test(e.body.sensation||'')).length;
   if(es.length<3)key='fool';
   else if(tension>=3&&tension>=(top[0]?.[1]||0))key='tower';
   else if(top.length>=4&&top[0][1]/totalSt<.35)key='wheel';
@@ -1096,7 +1118,7 @@ function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracl
   palette:DEFAULT_PALETTE.map(([name,color])=>({id:uid(),name,color})),
   v:2,home:HOME_DEFAULT.map(t=>({type:t,on:HOME_ON.has(t)})),
   radial:['body','entry:note','entry:photo','ritual','intention','state'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
-  sensations:['Tension','Pain','Bloating','Warmth','Numbness','Heaviness','Restlessness','Fatigue','Hunger','Tingling','Lightness'],
+  sensations:['Light','Heavy','Tense','Warm','Numb','Restless'],
   systems:['Breath','Digestion','Skin','Sleep','Energy','Nervous system','Appetite']};}
 async function seed(catNames){const now=Date.now();const items=[];let o=0;const mk=(type,x)=>{const it=Object.assign({id:uid(),type,createdAt:now+(o++),imageId:null},x);items.push(it);return it;};
   catNames.forEach((n,i)=>{const d=CAT_DEF[n];mk('category',{name:n,color:d?d[0]:PALETTE[i%PALETTE.length],icon:d?d[1]:'sign',order:i});});
@@ -1122,7 +1144,7 @@ function closeRadial(){const el=$('#radial');el.classList.remove('open');setTime
 /* ================= actions ================= */
 const draft=()=>cur().params.draft;
 function openEntry(kind,extra,pick){const d=newEntryDraft(kind,extra);go('edit',{draft:d});if(pick){const ref=parseRef('draft:photoIds:new');pickImage('4/3',id=>ref.set(id));}}
-function newBody(extra={}){const bc=ordered('category').find(c=>c.name.toLowerCase()==='body');go('body',{draft:newEntryDraft('body',Object.assign({body:{view:'front',region:null,sensation:null,intensity:3},categoryIds:bc?[bc.id]:[]},extra))});}
+function newBody(extra={}){const bc=ordered('category').find(c=>c.name.toLowerCase()==='body');go('body',{draft:newEntryDraft('body',Object.assign({body:{view:'front',region:null,side:null,sensation:null,intensity:3},categoryIds:bc?[bc.id]:[]},extra))});}
 const NEW={
   entry:()=>openEntry('note'),body:()=>newBody(),
   thread:()=>go('threadEdit',{draft:{id:uid(),type:'thread',name:'',description:'',color:PALETTE[all('thread').length%PALETTE.length],icon:'threads',coverId:null}}),
@@ -1183,8 +1205,9 @@ const A={
     pickSheet(t.dataset.title||'Choose',items,[d[f]],false,ids=>{d[f]=ids[0]||null;render();});},
   pickSigil:()=>{const d=draft();const items=all('sigil').map(s=>({id:s.id,label:s.name||'Untitled sigil'}));
     pickSheet('Sigil',items,[d.sigilId],false,ids=>{d.sigilId=ids[0]||null;render();},{label:'Draw a new sigil',fn:()=>{const extra={};if(d.type==='intention')extra.intentionId=S.items.has(d.id)?d.id:null;if(d.type==='ritual')extra.ritualId=S.items.has(d.id)?d.id:null;NEW.sigil(extra);cur().params.returnTo='sigilId';}});},
-  bodyView:t=>{const b=draft().body;if(b.view!==t.dataset.v){b.view=t.dataset.v;b.region=null;b.sensation=null;}render();},
-  bodyRegion:t=>{const b=draft().body;b.region=t.dataset.r||null;b.side=t.dataset.side||null;if(!b.region)b.sensation=null;render();},
+  bodyView:t=>{const b=draft().body;if(b.view!==t.dataset.v){b.view=t.dataset.v;b.region=null;b.side=null;b.sensation=null;}render();},
+  bodyRegion:t=>{const d=draft(),b=d.body;const r=t.dataset.r||null,side=t.dataset.side||null;if(r&&(r!==b.region||side!==b.side)){d._anim=true;BODY_SCROLL=0;if(b.region)b.sensation=null;}b.region=r;b.side=side;if(!r)b.sensation=null;render();},
+  bodySens:t=>{const b=draft().body;b.sensation=b.sensation===t.dataset.v?null:t.dataset.v;render();},
   addSens:()=>inputSheet('New sensation','',async v=>{if(!S.settings.sensations.includes(v))S.settings.sensations.push(v);await saveSettings();draft().body.sensation=v;render();},{ph:'e.g. Pulsing',btn:'Add'}),
   addSystem:()=>inputSheet('New system','',async v=>{if(!S.settings.systems.includes(v))S.settings.systems.push(v);await saveSettings();draft().body.region=v;render();},{ph:'e.g. Cycle',btn:'Add'}),
   threadSort:t=>{TS.sort=t.dataset.v;render();},

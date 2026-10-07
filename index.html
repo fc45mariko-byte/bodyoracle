@@ -1002,7 +1002,7 @@ V.onboard={nav:false,html(p){
   return `<div class="ob"><div class="grow"></div><h1 class="ob-brand">Body Oracle</h1><p class="ob-p">A private space for noticing your body, your life, and what gives it meaning.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="2">Continue</button></div></div>`;}};
 function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracle',accent:'#f2f2f3',cards:'filled',corners:'soft',heroImageId:null,heroText:'A quieter day is still a productive day.',currentIntentionId:null,oracleImages:{},
   v:2,home:HOME_DEFAULT.map(t=>({type:t,on:HOME_ON.has(t)})),
-  radial:['body','entry:mind','ritual','sign','intention','entry:photo','entry:note'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
+  radial:['body','entry:note','entry:photo','ritual','intention','state'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
   sensations:['Tension','Pain','Bloating','Warmth','Numbness','Heaviness','Restlessness','Fatigue','Hunger','Tingling','Lightness'],
   systems:['Breath','Digestion','Skin','Sleep','Energy','Nervous system','Appetite']};}
 async function seed(catNames){const now=Date.now();const items=[];let o=0;const mk=(type,x)=>{const it=Object.assign({id:uid(),type,createdAt:now+(o++),imageId:null},x);items.push(it);return it;};
@@ -1022,7 +1022,7 @@ async function seed(catNames){const now=Date.now();const items=[];let o=0;const 
 
 /* ================= RADIAL ================= */
 function openRadial(){const el=$('#radial');const items=S.settings.radial.filter(r=>r.on).slice(0,8);const n=items.length||1;const rad=Math.min(124,(Math.min(innerWidth,520)-100)/2);
-  el.innerHTML=`<h2 class="rad-t">What do you want<br>to add?</h2><div class="rad-area" style="min-height:${rad*2+100}px"><div class="rad-ring">${items.map((r,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return `<button class="rad-b" style="--x:${(Math.cos(a)*rad).toFixed(1)}px;--y:${(Math.sin(a)*rad).toFixed(1)}px;--d:${i*28}ms" data-a="radialPick" data-id="${r.id}">${ico(radialIcon(r),24)}<span class="rad-l">${esc(r.label)}</span></button>`;}).join('')}</div></div><button class="rad-x" data-a="closeRadial" aria-label="Close">${ico('close',22)}</button>`;
+  el.innerHTML=`<h2 class="rad-t">Add</h2><div class="rad-area" style="min-height:${rad*2+100}px"><div class="rad-ring">${items.map((r,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return `<button class="rad-b" style="--x:${(Math.cos(a)*rad).toFixed(1)}px;--y:${(Math.sin(a)*rad).toFixed(1)}px;--d:${i*28}ms" data-a="radialPick" data-id="${r.id}">${ico(radialIcon(r),24)}<span class="rad-l">${esc(r.label)}</span></button>`;}).join('')}</div></div><button class="rad-x" data-a="closeRadial" aria-label="Close">${ico('close',22)}</button>`;
   el.hidden=false;void el.offsetWidth;el.classList.add('open');if(navigator.vibrate)try{navigator.vibrate(8);}catch(e){}}
 function closeRadial(){const el=$('#radial');el.classList.remove('open');setTimeout(()=>{if(!el.classList.contains('open')){el.hidden=true;el.innerHTML='';}},220);}
 

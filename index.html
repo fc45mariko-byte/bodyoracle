@@ -250,6 +250,11 @@ img{max-width:100%}
 .cs-sw{position:relative;width:50px;height:50px;border-radius:50%;background:var(--c);flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
 .cs-sw input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 
+.set-g{margin:26px 0 8px}
+.set-g:first-of-type{margin-top:4px}
+.pal-mini{display:grid;grid-template-columns:repeat(2,8px);gap:2px}
+.pal-mini i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+
 /* threads */
 .t-cover .slot{aspect-ratio:16/10}
 .t-name{margin:16px 0 4px;font:700 30px/1.1 var(--body);letter-spacing:-.022em;text-wrap:balance}
@@ -970,38 +975,55 @@ V.oracle={nav:false,quiet:true,html(){const o=oracleReading();const done=all('or
 V.reading={quiet:true,html({id}){const o=get(id);if(!o)return head('Not found',{back:true});return `${head(fmt.day(o.date),{back:true})}${readingHTML(o,{saved:''})}<button class="danger-link" data-a="delReading" data-id="${id}">Delete reading</button>`;}};
 
 /* ================= SETTINGS ================= */
-const SS={tab:'categories'};
-const SET_TABS=[['categories','Categories'],['states','States'],['appearance','Appearance'],['layout','Layout'],['library','Library'],['data','Data']];
-function colorPicker(c){return `<div class="swatches">${PALETTE.map(p=>`<button class="sw ${c===p?'on':''}" style="--c:${p}" data-a="dset" data-f="color" data-v="${p}" aria-label="Color ${p}"></button>`).join('')}<label class="sw custom ${PALETTE.includes(c)?'':'on'}"><input type="color" id="cp" data-bind="color" value="${esc(c||'#c98d7c')}" aria-label="Custom color"></label></div>`;}
+function colorPicker(c){const pal=(S.settings.palette||[]).map(p=>p.color);const list=pal.length?pal:PALETTE;return `<div class="swatches">${list.map(p=>`<button class="sw ${c===p?'on':''}" style="--c:${p}" data-a="dset" data-f="color" data-v="${p}" aria-label="Colour ${p}"></button>`).join('')}<label class="sw custom ${list.includes(c)?'':'on'}"><input type="color" id="cp" data-bind="color" value="${esc(c||'#c98d7c')}" aria-label="Custom colour"></label></div>`;}
 function iconPicker(c){return `<div class="icons">${ICON_CHOICES.map(i=>`<button class="icb ${c===i?'on':''}" data-a="dset" data-f="icon" data-v="${i}" aria-label="${i}">${ico(i,20)}</button>`).join('')}</div>`;}
 const seg=(k,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${S.settings[k]===v?'on':''}" data-a="setS" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
 const sortRow=(type,x,extra='')=>`<div class="row srow" data-id="${x.id}"><i class="dot lg" style="--c:${x.color}"></i><button class="row-m btn-plain" data-a="editMeta" data-id="${x.id}">${esc(x.name)}</button>${extra}<div class="sthumb">${slot(x.imageId,`item:${x.id}:imageId`,'1/1')}</div><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`;
 const SET={
   categories(){return `<p class="hint">Your own words for the parts of your life. Drag to reorder.</p><div class="list card sortable" data-sort="category">${ordered('category').map(c=>sortRow('category',c)).join('')}<button class="row add" data-a="new" data-t="category">${ico('plus',18)} Add a category</button></div>`;},
   states(){return `<p class="hint">States you can attach to any day or entry. Make them yours.</p><div class="list card sortable" data-sort="state">${ordered('state').map(s=>sortRow('state',s)).join('')}<button class="row add" data-a="new" data-t="state">${ico('plus',18)} Add a state</button></div>`;},
-  appearance(){const s=S.settings;return `<span class="lbl" style="margin-top:4px">Name of your space</span><input class="field" id="s-name" data-sbind="name" value="${esc(s.name)}" placeholder="Body Oracle">
+  palette(){const pal=S.settings.palette||[];return `<p class="hint">Your own colour language. Give each colour any name you like; it means what you decide. Drag to reorder.</p><div class="list card sortable" data-sort="palette">${pal.map(p=>`<div class="row srow" data-id="${p.id}"><i class="dot lg" style="--c:${p.color}"></i><button class="row-m btn-plain" data-a="editSwatch" data-id="${p.id}">${esc(p.name||'Untitled')}</button><span class="row-v">${plural(all('entry').filter(e=>e.colorId===p.id).length,'entry','entries')}</span><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}<button class="row add" data-a="addPaletteColor">${ico('plus',18)} Add a colour</button></div>`;},
+  theme(){const s=S.settings;return `<span class="lbl" style="margin-top:4px">Name of your space</span><input class="field" id="s-name" data-sbind="name" value="${esc(s.name)}" placeholder="Body Oracle">
    <span class="lbl">Accent</span><div class="swatches">${ACCENTS.map(a=>`<button class="sw ${s.accent===a.c?'on':''}" style="--c:${a.c}" data-a="setS" data-k="accent" data-v="${a.c}" aria-label="${a.n}"></button>`).join('')}<label class="sw custom ${ACCENTS.some(a=>a.c===s.accent)?'':'on'}"><input type="color" id="s-acc" data-scolor="accent" value="${esc(s.accent)}" aria-label="Custom accent"></label></div>
-   <span class="lbl">Cards</span>${seg('cards',[['filled','Filled'],['outline','Outline']])}
-   <span class="lbl">Image corners</span>${seg('corners',[['soft','Soft'],['round','Round'],['square','Square']])}
-   <span class="lbl">Home image & words</span><div style="max-width:220px">${slot(s.heroImageId,'settings:heroImageId','4/3')}</div><input class="field mt" id="s-hero" data-sbind="heroText" value="${esc(s.heroText||'')}" placeholder="A line for your Home">`;},
-  layout(){const s=S.settings;return `<h3 class="sub-h" style="margin-top:4px">Home</h3><p class="hint">Drag to reorder. Switch a module off to hide it.</p>
+   <span class="lbl">Cards</span>${seg('cards',[['filled','Filled'],['outline','Outline']])}`;},
+  corners(){return `<p class="hint">How rounded images and cards are.</p>${seg('corners',[['soft','Soft'],['round','Round'],['square','Square']])}`;},
+  home(){const s=S.settings;return `<p class="hint">Drag to reorder. Switch a section off to hide it.</p>
    <div class="list card sortable" data-sort="home">${s.home.filter(m=>MODS[m.type]).map(m=>`<div class="row srow" data-id="${m.type}"><span class="row-m"><span class="row-t">${MODS[m.type].label}</span>${MODS[m.type].ready&&!MODS[m.type].ready()?`<span class="row-s">${MODS[m.type].hint}</span>`:''}</span><button class="tog ${m.on?'on':''}" data-a="togMod" data-id="${m.type}" role="switch" aria-checked="${m.on}" aria-label="Show ${MODS[m.type].label}"><i></i></button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}</div>
-   <h3 class="sub-h">+ menu</h3><p class="hint">What appears when you tap +. Up to 8 at once. Tap a name to rename or remove it.</p>
+   ${s.home.find(m=>m.type==='hero'&&m.on)?`<span class="lbl">Home image & words</span><div style="max-width:220px">${slot(s.heroImageId,'settings:heroImageId','4/3')}</div><input class="field mt" id="s-hero" data-sbind="heroText" value="${esc(s.heroText||'')}" placeholder="A line for your Home">`:''}`;},
+  radial(){const s=S.settings;return `<p class="hint">What appears when you tap +. Up to 8 at once. Tap a name to rename or remove it.</p>
    <div class="list card sortable" data-sort="radial">${s.radial.map(r=>`<div class="row srow" data-id="${r.id}"><span class="row-i">${ico(radialIcon(r),18)}</span><button class="row-m btn-plain" data-a="radialItem" data-id="${r.id}">${esc(r.label)}</button><button class="tog ${r.on?'on':''}" data-a="togRadial" data-id="${r.id}" role="switch" aria-checked="${r.on}" aria-label="Show ${esc(r.label)}"><i></i></button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}<button class="row add" data-a="addRadial">${ico('plus',18)} Add to + menu</button></div>`;},
-  library(){const s=S.settings;return `<div class="list card">
-   <button class="row" data-a="go" data-to="rituals"><span class="row-i">${ico('ritual',18)}</span><span class="row-m">Rituals</span><span class="row-v">${all('ritual').length}</span>${ico('chev',16)}</button>
-   <button class="row" data-a="go" data-to="intentions"><span class="row-i">${ico('intention',18)}</span><span class="row-m">Intentions</span><span class="row-v">${all('intention').length}</span>${ico('chev',16)}</button>
-   <button class="row" data-a="go" data-to="sigils"><span class="row-i">${ico('pen',18)}</span><span class="row-m">Sigils</span><span class="row-v">${all('sigil').length}</span>${ico('chev',16)}</button>
-   <button class="row" data-a="archOracle"><span class="row-i">${ico('oracle',18)}</span><span class="row-m">Oracle readings</span><span class="row-v">${all('oracle').length}</span>${ico('chev',16)}</button></div>
-   <h3 class="sub-h">Body sensations</h3><p class="hint">Tap one to remove it.</p><div class="chips">${s.sensations.map((x,i)=>`<button class="chip" data-a="delListS" data-k="sensations" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="sensations">+ Add</button></div>
-   <h3 class="sub-h">Body systems</h3><div class="chips">${s.systems.map((x,i)=>`<button class="chip" data-a="delListS" data-k="systems" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="systems">+ Add</button></div>`;},
-  data(){const n=all('entry').length;return `<p class="hint">Everything you add stays on this device. Nothing is sent anywhere. Removing the app from your Home Screen deletes its data, so export a backup now and then.</p>
-   <div class="list card"><button class="row" data-a="exportData"><span class="row-i">${ico('archive',18)}</span><span class="row-m"><span class="row-t">Export a backup</span><span class="row-s">${plural(n,'entry','entries')} and ${plural(IMG.size,'image','images')}</span></span></button>
-   <label class="row" for="import-file"><span class="row-i">${ico('undo',18)}</span><span class="row-m"><span class="row-t">Restore from a backup</span><span class="row-s">Replaces what is here now</span></span><input type="file" id="import-file" accept="application/json,.json" hidden></label></div>
-   <button class="danger-link" data-a="eraseAll">Erase everything</button>`;},
+  body(){const s=S.settings;return `<span class="lbl" style="margin-top:4px">Sensations</span><p class="hint">Words offered when you tap the body. Tap one to remove it.</p><div class="chips">${s.sensations.map((x,i)=>`<button class="chip" data-a="delListS" data-k="sensations" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="sensations">+ Add</button></div>
+   <span class="lbl">Systems</span><p class="hint">Things that don’t belong to one place.</p><div class="chips">${s.systems.map((x,i)=>`<button class="chip" data-a="delListS" data-k="systems" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="systems">+ Add</button></div>`;},
+  data(){const n=all('entry').length;return `<p class="hint">Everything you add stays in this browser on this device. Nothing is sent anywhere.</p>
+   <div class="list card">${[['Entries',n],['Images',IMG.size],['Threads',all('thread').length],['Rituals',all('ritual').length],['Intentions',all('intention').length],['Sigils',all('sigil').length],['Oracle readings',all('oracle').length]].map(([l,v])=>`<div class="row"><span class="row-m">${l}</span><span class="row-v">${v}</span></div>`).join('')}</div>
+   <p class="hint mt">Removing the app from your Home Screen deletes its data. Export a backup now and then.</p>`;},
+  backup(){const n=all('entry').length;return `<div class="list card"><button class="row" data-a="exportData"><span class="row-i">${ico('archive',18)}</span><span class="row-m"><span class="row-t">Export a backup</span><span class="row-s">${plural(n,'entry','entries')} and ${plural(IMG.size,'image','images')}</span></span></button>
+   <label class="row" for="import-file"><span class="row-i">${ico('undo',18)}</span><span class="row-m"><span class="row-t">Restore from a backup</span><span class="row-s">Replaces what is here now</span></span><input type="file" id="import-file" accept="application/json,.json" hidden></label></div>`;},
+  reset(){return `<p class="hint">Erase every entry, image, thread, ritual and setting on this device and start again from the beginning. This cannot be undone.</p><button class="btn ghost" data-a="eraseAll" style="color:var(--danger)">Erase everything</button>`;},
 };
-V.settings={html(){return `${head('Customize your space')}<div class="chips scroll">${SET_TABS.map(([k,l])=>`<button class="chip ${SS.tab===k?'on':''}" data-a="settingsTab" data-tab="${k}">${l}</button>`).join('')}</div>${SET[SS.tab]()}`;},after:bindSortables};
-V.layout={html(){return head('Edit Home',{back:true})+SET.layout();},after:bindSortables};
+const SET_TITLES={categories:'Categories',states:'States',palette:'My palette',theme:'Theme',corners:'Corners',home:'Home layout',radial:'+ menu',body:'Body',data:'Data',backup:'Backup',reset:'Reset'};
+const setRow=(icon,label,act,val='',extra='')=>`<button class="row" data-a="${act}" ${extra}><span class="row-i">${icon}</span><span class="row-m">${label}</span><span class="row-v">${esc(val)}</span>${ico('chev',16)}</button>`;
+const setGo=(k,icon,val='')=>setRow(icon,SET_TITLES[k],'go',val,`data-to="set" data-p="${esc(JSON.stringify({k}))}"`);
+const goRow=(to,icon,label,val='')=>setRow(icon,label,'go',val,`data-to="${to}"`);
+V.settings={html(){const pal=S.settings.palette||[];return `${head('Settings')}
+  <h2 class="sec-t set-g">My world</h2><div class="list card">
+   ${setGo('categories',ico('tag',18),ordered('category').length)}
+   ${setGo('states',ico('state',18),ordered('state').length)}
+   ${setGo('palette',`<span class="pal-mini">${pal.slice(0,4).map(p=>`<i style="--c:${p.color}"></i>`).join('')}</span>`,pal.length)}
+   ${setRow(ico('threads',18),'Threads','tab',all('thread').length,'data-t="threads"')}
+   ${goRow('rituals',ico('ritual',18),'Rituals',all('ritual').length)}
+   ${goRow('intentions',ico('intention',18),'Intentions',all('intention').length)}
+   ${goRow('sigils',ico('pen',18),'Sigils',all('sigil').length)}
+   ${setRow(ico('oracle',18),'Oracle','go','', 'data-to="oracle"')}
+   ${setGo('body',ico('body',18))}
+  </div>
+  <h2 class="sec-t set-g">Appearance</h2><div class="list card">
+   ${setGo('theme',ico('sun',18))}${setGo('corners',ico('photo',18),{soft:'Soft',round:'Round',square:'Square'}[S.settings.corners]||'')}${setGo('home',ico('home',18))}${setGo('radial',ico('plus',18))}
+  </div>
+  <h2 class="sec-t set-g">Advanced</h2><div class="list card">
+   ${setGo('data',ico('archive',18))}${setGo('backup',ico('undo',18))}${setGo('reset',ico('trash',18))}
+  </div>`;}};
+V.set={html({k}){return head(SET_TITLES[k]||'Settings',{back:true})+(SET[k]?SET[k]():'');},after:bindSortables};
 V.metaEdit={nav:false,html({draft:d}){const isState=d.type==='state';const isNew=!S.items.has(d.id);const noun=isState?'state':'category';
   return `${edHead(isNew?`New ${noun}`:`Edit ${noun}`,'saveMeta')}
   <div class="ce-top"><div>${slot(d.imageId,'draft:imageId','1/1')}</div><div><span class="lbl">Name</span><input class="field" id="m-name" data-bind="name" value="${esc(d.name||'')}" placeholder="${isState?'e.g. Magnetic':'e.g. Germany'}"></div></div>
@@ -1017,7 +1039,7 @@ function bindSortables(){$$('.sortable').forEach(list=>{if(list._s)return;list._
     const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);row.classList.remove('dragging');reorder(list.dataset.sort,$$('.srow',list).map(r=>r.dataset.id));};
     window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);});});}
 async function reorder(kind,ids){
-  if(kind==='home'||kind==='radial'){const key=kind==='home'?'type':'id';const arr=S.settings[kind];arr.sort((a,b)=>ids.indexOf(a[key])-ids.indexOf(b[key]));await saveSettings();return;}
+  if(kind==='home'||kind==='radial'||kind==='palette'){const key=kind==='home'?'type':'id';const arr=S.settings[kind];arr.sort((a,b)=>ids.indexOf(a[key])-ids.indexOf(b[key]));await saveSettings();return;}
   for(let i=0;i<ids.length;i++){const x=get(ids[i]);if(x&&x.order!==i){x.order=i;await save(x);}}}
 
 /* ================= ONBOARDING ================= */
@@ -1101,6 +1123,10 @@ const A={
     finalizeDraft(d);await save(d);R.stack.pop();render();toast('Saved');},
   saveBody:async()=>{const d=draft();if(!d.body.region){toast('Tap a place on the body first.');return;}finalizeDraft(d);await save(d);R.stack.pop();render();toast('Observation saved');},
   cancelDraft:()=>{const d=draft();if(d)(d._new||[]).forEach(dropImage);if(cur().name==='sigil'){SG.buf=null;SG.hist=[];}back();},
+  editSwatch:t=>{const p=S.settings.palette.find(x=>x.id===t.dataset.id);if(!p)return;
+    colorSheet('Colour',p,async v=>{const changed=v.color!==p.color;p.name=v.name||p.name;p.color=v.color;await saveSettings();
+      if(changed)for(const e of all('entry'))if(e.colorId===p.id){e.color=p.color;await save(e);}render();},
+     {onDelete:()=>confirmSheet(`Delete “${p.name}” from your palette? Entries keep their colour.`,'Delete colour',async()=>{S.settings.palette=S.settings.palette.filter(x=>x!==p);await saveSettings();for(const e of all('entry'))if(e.colorId===p.id){e.colorId=null;await save(e);}render();})});},
   togMore:()=>{const d=draft();d._more=!d._more;render();},
   pickColor:t=>{const d=draft();const p=(S.settings.palette||[]).find(x=>x.id===t.dataset.id);if(!p)return;if(d.colorId===p.id||(!d.colorId&&d.color===p.color)){d.color=null;d.colorId=null;}else{d.color=p.color;d.colorId=p.id;}render();},
   clearColor:()=>{const d=draft();d.color=null;d.colorId=null;render();},
@@ -1127,7 +1153,6 @@ const A={
   threadPhoto:t=>{const {t:tid,e:eid,p}=t.dataset;sheet([{label:'Open entry',fn:()=>go('entry',{id:eid})},{label:'Set as thread cover',fn:async()=>{const th=get(tid);const nid=await copyImage(p);if(!nid)return;const old=th.coverId;th.coverId=nid;await save(th);dropImage(old);render();toast('Cover updated');}}]);},
   archFilter:t=>{AS.filter=t.dataset.f;render();},
   archOracle:()=>{AS.filter='oracle';tab('archive');},
-  settingsTab:t=>{SS.tab=t.dataset.tab;if(R.tab!=='settings'||R.stack.length)tab('settings');else render();},
   editMeta:t=>go('metaEdit',{draft:clone(get(t.dataset.id))}),
   saveMeta:async()=>{const d=draft();if(!(d.name||'').trim()){toast('Give it a name.');return;}d.name=d.name.trim();finalizeDraft(d);await save(d);R.stack.pop();render();toast('Saved');},
   delMeta:t=>{const x=get(t.dataset.id);const f=x.type==='state'?'stateIds':'categoryIds';confirmSheet(`Delete “${x.name}”? Entries keep everything else.`,'Delete',async()=>{dropImage(x.imageId);for(const e of all('entry'))if((e[f]||[]).includes(x.id)){e[f]=e[f].filter(i=>i!==x.id);await save(e);}S.settings.radial=S.settings.radial.filter(r=>r.action!=='cat:'+x.id);await saveSettings();await removeItem(x.id);back();});},

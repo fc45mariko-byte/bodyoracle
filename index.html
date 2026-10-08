@@ -42,7 +42,7 @@ img{max-width:100%}
 #main.quiet{background:radial-gradient(120% 60% at 50% 0%,rgba(255,255,255,.06),transparent 70%),var(--bg)}
 
 /* bottom bar */
-#nav{display:grid;grid-template-columns:repeat(6,1fr);align-items:end;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);border-top:1px solid var(--line);background:var(--bg)}
+#nav{display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);border-top:1px solid var(--line);background:var(--bg)}
 .nb{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:var(--faint);font-size:10px;letter-spacing:.02em;padding:4px 0}
 .nb.on{color:var(--fg)}
 .nb.plus{align-self:center}
@@ -387,6 +387,78 @@ img{max-width:100%}
 #toast.show{opacity:1}
 .banner{background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--muted);margin-bottom:14px}
 
+
+/* ritual library */
+.need-btns{display:flex;flex-direction:column;gap:8px}
+.need-b{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:10px 14px;border-radius:var(--r-card);border:1px solid var(--card-bd);background:var(--card-bg);color:var(--fg);text-align:left}
+.need-b:active{background:var(--surface-2)}
+.need-b>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:2px}
+.need-b b{font-weight:600;font-size:16px}
+.need-b small{font-size:13px;color:var(--muted)}
+.need-b .ic:last-child{color:var(--faint)}
+.need-i{width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;color:var(--fg);flex:none}
+.tonight{display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px 10px 10px;text-align:left;color:var(--fg)}
+.tn-img{width:64px;height:64px;border-radius:calc(var(--r-img)*.8);overflow:hidden;background:color-mix(in srgb,var(--c,var(--muted)) 16%,var(--surface-2));display:grid;place-items:center;color:var(--muted);flex:none}
+.tn-img img{width:100%;height:100%;object-fit:cover}
+.tn-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.tn-t{font-weight:600;font-size:17px;letter-spacing:-.01em}
+.rimg{position:relative}
+.obj-name{margin:16px 0 8px;font:700 28px/1.12 var(--body);letter-spacing:-.022em;text-wrap:balance;display:flex;align-items:baseline;gap:10px}
+.obj-name[style]::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--c);flex:none;transform:translateY(-3px)}
+.obj-int{font-size:17px;line-height:1.5;color:var(--fg);margin:14px 0 0;white-space:pre-wrap}
+.obj-act{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.ibtn.fav{color:#e8c26a}
+.ibtn.fav svg{fill:currentColor}
+.title-in{font-size:20px;font-weight:600;margin-top:14px;letter-spacing:-.01em}
+.mt-s{margin-top:8px}
+.btn.sm{height:42px;font-size:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.pthumb{width:44px;height:44px;border-radius:10px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;color:var(--muted);flex:none}
+.pthumb img{width:100%;height:100%;object-fit:cover}
+.btn-plain.prod-r{flex-direction:row;align-items:center;gap:12px;min-width:0;padding:4px 0}
+.prod-r .row-m{min-width:0}
+.need .row{gap:12px}
+.need .row.have .row-t{color:var(--muted);text-decoration:line-through}
+.steps{display:flex;flex-direction:column;gap:6px}
+.stp{display:flex;align-items:flex-start;gap:6px;background:var(--card-bg);border:1px solid var(--card-bd);border-radius:14px;padding:6px 4px 6px 10px}
+.stp .n{width:18px;padding-top:12px;color:var(--muted);font-size:13px;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+.stp-m{flex:1;min-width:0}
+.stp-t{border:0;background:none;padding:10px 6px;resize:none;overflow:hidden;font-size:15px;min-height:0}
+.stp .ibtn,.stp .handle{margin-top:4px}
+.stp.dragging{background:var(--surface-2)}
+.bdgs{display:flex;flex-wrap:wrap;gap:5px;padding:0 6px 6px}
+.rit-steps .bdgs{padding:6px 0 0}
+.bdg{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-size:11.5px;max-width:100%;overflow:hidden;white-space:nowrap}
+.bdg.img{padding:0;width:22px;overflow:hidden}
+.bdg.img img{width:22px;height:22px;object-fit:cover}
+.prod-img{max-width:220px;margin:0 auto}
+.prod-img .tile{aspect-ratio:1}
+/* ritual mode */
+.run{position:fixed;inset:0;z-index:25;max-width:520px;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 6px) 20px calc(env(safe-area-inset-bottom,0px) + 18px);box-sizing:border-box}
+.run-hd{display:grid;grid-template-columns:auto 1fr auto;align-items:center;margin:0 -10px}
+.run-p{text-align:center;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.run-bar{height:2px;background:var(--line);border-radius:2px;margin:6px 0 0;overflow:hidden}
+.run-bar i{display:block;height:100%;background:var(--fg);transition:width .3s}
+.run-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;padding:24px 0;animation:vin .3s ease-out}
+.run-t{font:700 32px/1.12 var(--body);letter-spacing:-.025em;margin:8px 0 0;text-wrap:balance}
+.run-step{font:600 30px/1.2 var(--body);letter-spacing:-.022em;margin:0;text-wrap:balance}
+.run-img{border-radius:var(--r-img);overflow:hidden;margin-bottom:22px;max-height:40vh}
+.run-img img{width:100%;height:100%;max-height:40vh;object-fit:cover;display:block}
+.run-meta{display:flex;align-items:center;gap:8px;color:var(--muted);margin:16px 0 0;font-size:15px}
+.run-meta a{color:var(--fg);overflow-wrap:anywhere}
+.run-foot{display:flex;flex-direction:column;align-items:center;gap:6px}
+/* prayers */
+.pray-text{font:400 21px/1.55 var(--body);letter-spacing:-.01em;white-space:pre-wrap;overflow-wrap:anywhere;margin:22px 0 8px}
+.pray-in{min-height:200px;font-size:17px;line-height:1.55}
+.pray-img{margin-top:4px}
+.need-q{font:700 24px/1.2 var(--body);letter-spacing:-.02em;margin:6px 0 16px}
+.chip.faint{color:var(--muted);border-color:var(--line)}
+.chip .cnt{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip.on .cnt{color:inherit;opacity:.7}
+.empty-need{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.empty-need .btn{width:auto;padding:0 20px}
+.ob-s{font-size:14px;margin-top:14px}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 </style>
@@ -474,6 +546,13 @@ const IC={
   flower:'<circle cx="12" cy="9" r="2.2"/><path d="M12 6.8c0-3 3.5-3 3.5 0s-3.5 2.2-3.5 2.2M12 6.8c0-3-3.5-3-3.5 0s3.5 2.2 3.5 2.2M14.2 9c3 0 3 3.5 0 3.5s-2.2-3.5-2.2-3.5M9.8 9c-3 0-3 3.5 0 3.5S12 9 12 9M12 11.2V21M12 17c-2-2-4.5-2-5.5-1"/>',
   key:'<circle cx="8" cy="15" r="3.5"/><path d="m10.5 12.5 9-9M16.5 6.5l2 2M14 9l2 2"/>',
   wave:'<path d="M3 9c3-3 6 3 9 0s6 3 9 0M3 15c3-3 6 3 9 0s6 3 9 0"/>',
+  prayer:'<path d="M3.5 6.2c3-1.1 5.6-.8 8.5 1.1 2.9-1.9 5.5-2.2 8.5-1.1v12.6c-3-1-5.6-.7-8.5 1.2-2.9-1.9-5.5-2.2-8.5-1.2z"/><path d="M12 7.3v12.6"/>',
+  star:'<path d="m12 4 2.4 5 5.4.6-4 3.7 1.1 5.4L12 16l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6z"/>',
+  more:'<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>',
+  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  play:'<path d="M8 5.5v13l10-6.5z"/>',
+  bag:'<path d="M5.5 8h13l-1 12.5h-11z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+  music:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
   people:'<circle cx="9" cy="8" r="3"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5M15.5 5.5a3 3 0 0 1 0 5.6M17.5 14c1.6.6 2.7 2.2 3 5"/>',
 };
 const ico=(n,s=22)=>`<svg class="ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||IC.sign}</svg>`;
@@ -498,7 +577,8 @@ const KINDS={
   state:{label:'State',icon:'state',color:'#a39a8f'},
 };
 const RADIAL_TYPES=[
-  {action:'body',label:'Body',icon:'body'},{action:'entry:mind',label:'Mind',icon:'mind'},{action:'ritual',label:'Ritual',icon:'ritual'},
+  {action:'newRitual',label:'Ritual',icon:'ritual'},{action:'newPrayer',label:'Prayer',icon:'prayer'},
+  {action:'body',label:'Body',icon:'body'},{action:'entry:mind',label:'Mind',icon:'mind'},{action:'ritual',label:'Ritual done',icon:'check'},
   {action:'sign',label:'Sign',icon:'sign'},{action:'intention',label:'Intention',icon:'intention'},{action:'entry:photo',label:'Photo',icon:'photo'},
   {action:'entry:note',label:'Note',icon:'note'},{action:'entry:dream',label:'Dream',icon:'dream'},{action:'state',label:'State',icon:'state'},
   {action:'sigil',label:'Sigil',icon:'pen'},
@@ -572,8 +652,10 @@ function openCropper(blob,ratioStr,done){
 
 /* image slot: any image container in the app */
 function slot(id,ref,ratio='1/1',cls=''){const u=id&&IMG.get(id);return `<button type="button" class="slot ${u?'has':''} ${cls}" style="aspect-ratio:${ratio}" data-a="slot" data-ref="${ref}" data-ratio="${ratio}" aria-label="${u?'Change image':'Add image'}">${u?`<img src="${u}" alt="">`:`<span class="slot-plus"><i>${ico('plus',20)}</i></span>`}</button>`;}
+const getPath=(o,p)=>p.split('.').reduce((t,k)=>t==null?t:t[k],o);
 function parseRef(s){
   const p=s.split(':');let target,persist,isDraft=false,rest;
+  if(p[0]==='dpath'){const d=cur().params.draft,path=p[1];return{get:()=>getPath(d,path),set:async nid=>{setPath(d,path,nid||null);if(nid)(d._new=d._new||[]).push(nid);render();},drop:id=>{(d._drop=d._drop||[]).push(id);},coverable:false};}
   if(p[0]==='draft'){target=cur().params.draft;isDraft=true;persist=async()=>render();rest=p.slice(1);}
   else if(p[0]==='settings'){target=S.settings;persist=async()=>{await saveSettings();render();};rest=p.slice(1);}
   else if(p[0]==='smap'){target=S.settings[p[1]]=S.settings[p[1]]||{};persist=async()=>{await saveSettings();render();};rest=p.slice(2);}
@@ -588,14 +670,15 @@ function parseRef(s){
     makeCover:async()=>{const arr=target[field];const [x]=arr.splice(+idx,1);arr.unshift(x);await persist();},
   };
 }
-function finalizeDraft(d){(d._drop||[]).forEach(dropImage);delete d._new;delete d._drop;delete d._more;delete d._anim;return d;}
+function finalizeDraft(d){(d._drop||[]).forEach(dropImage);delete d._new;delete d._drop;delete d._more;delete d._anim;delete d._sitAll;delete d._rituals;return d;}
 
 /* ================= router ================= */
 const R={tab:'home',stack:[]};
 const cur=()=>R.stack[R.stack.length-1]||{name:R.tab,params:{}};
 function go(name,params={}){R.stack.push({name,params});render();}
 function back(){R.stack.pop();render();}
-function tab(t){R.tab=t;R.stack=[];render();}
+function tab(t){let st=[];if(t==='map'){AS.view=MS.mode;t='archive';}else if(t==='threads'){t='archive';st=[{name:'threads',params:{}}];}else if(t==='settings'){t='home';st=[{name:'settings',params:{}}];}
+  stopTimer();R.tab=t;R.stack=st;render();}
 const V={};
 function render(){
   const c=cur();const view=V[c.name]||V.home;const main=$('#main');const key=c.name+'|'+R.stack.length;const same=main.dataset.k===key;const st=main.scrollTop;
@@ -649,6 +732,7 @@ function moonSVG(){const p=moonPhase(),r=7,cx=8,cy=8,k=Math.cos(p*2*Math.PI),wax
 const ONE={Arms:'arm',Hands:'hand',Legs:'leg',Feet:'foot',Shoulders:'shoulder'};
 const placeName=b=>!b||!b.region?'':b.side&&ONE[b.region]?`${b.side} ${ONE[b.region]}`:b.region.toLowerCase();
 function entryLabel(e){
+  if(e.kind==='ritual'&&get(e.ritualId))return get(e.ritualId).name;
   if(e.kind==='body'){const b=e.body||{};const pl=placeName(b);return b.sensation?`${b.sensation}${pl?` (${pl})`:''}`:(pl?pl[0].toUpperCase()+pl.slice(1):'Body observation');}
   const t=(e.text||'').trim();if(t)return t.split('\n')[0].slice(0,140);
   if(e.kind==='ritual'&&get(e.ritualId))return get(e.ritualId).name;
@@ -675,7 +759,16 @@ function radialIcon(r){if(r.action.startsWith('cat:')){const c=get(r.action.slic
 const recorded=()=>all('entry').filter(e=>e.kind!=='state').length;
 const UNLOCK={oracle:5,intention:8};
 const activeThread=()=>threadsByRelevance().find(t=>threadCount(t.id)>0);
+function tonightItem(){const t=S.settings.tonight;const x=t&&get(t.id);if(x)return x;const h=new Date().getHours();if(h<17&&h>=5)return null;
+  return[...all('ritual'),...all('prayer')].sort(byUse).find(y=>(y.situations||[]).some(s=>/sleep|night|tonight|evening|bed/i.test(s)))||null;}
 Object.assign(MODS,{
+  need:{label:'What do you need?',html(){return `<section><div class="sec-h"><h2 class="sec-t">What do you need?</h2></div><div class="need-btns">
+    <button class="need-b" data-a="go" data-to="need" data-p="${jp({kind:'ritual'})}"><span class="need-i">${ico('ritual',22)}</span><span><b>Rituals</b><small>Something to do</small></span>${ico('chev',16)}</button>
+    <button class="need-b" data-a="go" data-to="need" data-p="${jp({kind:'prayer'})}"><span class="need-i">${ico('prayer',22)}</span><span><b>Prayers</b><small>Words to return to</small></span>${ico('chev',16)}</button>
+    <button class="need-b" data-a="recordSheet"><span class="need-i">${ico('note',22)}</span><span><b>Record something</b><small>What happened</small></span>${ico('chev',16)}</button></div></section>`;}},
+  tonight:{label:'For tonight',ready:()=>!!tonightItem(),hint:'Appears when you keep a ritual or prayer for tonight',html(){const x=tonightItem();if(!x)return'';const isR=x.type==='ritual';
+    return `<section><div class="sec-h"><h2 class="sec-t">For tonight</h2></div><button class="tonight card" data-a="go" data-to="${isR?'ritual':'prayer'}" data-p="${jp({id:x.id})}"><span class="tn-img" ${x.color?`style="--c:${x.color}"`:''}>${imgTag(x.imageId)||ico(isR?'candle':'prayer',26)}</span><span class="tn-m"><span class="eyebrow">${isR?'Ritual':'Prayer'}</span><span class="tn-t">${esc(x.name)}</span>${(x.situations||[])[0]?`<span class="row-s">${esc(x.situations[0])}</span>`:''}</span>${ico('chev',16)}</button></section>`;}},
+  yourRituals:{label:'Your rituals',html(){const rs=all('ritual').sort(byUse).slice(0,6);return `<section><div class="sec-h"><h2 class="sec-t">Your rituals</h2>${rs.length?`<button class="lnk" data-a="tab" data-t="rituals">Library</button>`:''}</div>${rs.length?`<div class="hscroll">${rs.map(r=>`<div class="rcard-h">${ritCard(r)}</div>`).join('')}</div>`:`<button class="empty-cta" data-a="new" data-t="ritual">Prepare a ritual for a moment you know will come again.</button>`}</section>`;}},
   states:{label:'How are you?',html(){const st=ordered('state'),t=todayStates();if(!st.length)return'';return `<section><div class="sec-h"><h2 class="sec-t">How are you?</h2></div><div class="chips scroll flush">${st.map(x=>`<button class="chip ${t.has(x.id)?'on':''}" data-a="logState" data-id="${x.id}" aria-pressed="${t.has(x.id)}"><i class="dot" style="--c:${x.color}"></i>${esc(x.name)}</button>`).join('')}</div></section>`;}},
   add:{label:'Add something',html(){return `<button class="add-big" data-a="radial">${ico('plus',20)}<span>Add something</span></button>`;}},
   recent:{label:'Recent',html(){const es=entries().filter(e=>e.kind!=='state').slice(0,6);return `<section><div class="sec-h"><h2 class="sec-t">Recent</h2>${es.length?`<button class="lnk" data-a="tab" data-t="map">See all</button>`:''}</div>${es.length?`<div class="grid3">${es.map(e=>tile(e)).join('')}</div>`:`<p class="empty">What you add appears here.</p>`}</section>`;}},
@@ -686,14 +779,13 @@ Object.assign(MODS,{
   hero:{label:'Image & words',html(){const s=S.settings,has=s.heroImageId&&IMG.get(s.heroImageId);return `<section class="hero">${slot(s.heroImageId,'settings:heroImageId','4/3')}<button class="hero-q ${has?'on-img':''} ${s.heroText?'':'ph'}" data-a="editHero">${esc(s.heroText||'Write something for today')}</button></section>`;}},
   world:{label:'Your world',html(){const cs=ordered('category');if(!cs.length)return'';return `<section><div class="sec-h"><h2 class="sec-t">Your world</h2></div><div class="hscroll">${cs.map(c=>`<button class="wtile" data-a="mapFilter" data-f="cat:${c.id}"><span class="wimg" style="--c:${c.color}">${imgTag(c.imageId)||ico(c.icon,26)}</span><span class="wname">${esc(c.name)}</span></button>`).join('')}</div></section>`;}},
   threads:{label:'Threads',html(){const th=threadsByRelevance().slice(0,4);return `<section><div class="sec-h"><h2 class="sec-t">Threads</h2><button class="lnk" data-a="tab" data-t="threads">See all</button></div>${th.length?`<div class="list card">${th.map(threadRow).join('')}</div>`:`<p class="empty">No threads yet.</p>`}</section>`;}},
-  rituals:{label:'Rituals',html(){const rs=ordered('ritual').slice(0,6);return `<section><div class="sec-h"><h2 class="sec-t">Rituals</h2><button class="lnk" data-a="go" data-to="rituals">Library</button></div>${rs.length?`<div class="hscroll">${rs.map(r=>`<div class="rcard-h">${ritCard(r)}</div>`).join('')}</div>`:`<p class="empty">No rituals yet.</p>`}</section>`;}},
   body:{label:'Body',html(){const es=entries().filter(e=>e.kind==='body').slice(0,3);return `<section><div class="sec-h"><h2 class="sec-t">Body</h2><button class="lnk" data-a="new" data-t="body">Open body</button></div>${es.length?`<div class="lines">${es.map(e=>lineRow(e,true)).join('')}</div>`:`<p class="empty">No observations yet.</p>`}</section>`;}},
 });
-const HOME_DEFAULT=['states','add','recent','thread','intention','oracle','hero','world','threads','rituals','body'];
-const HOME_ON=new Set(['states','add','recent','thread','intention','oracle']);
+const HOME_DEFAULT=['need','tonight','yourRituals','states','recent','thread','intention','oracle','add','hero','world','threads','body'];
+const HOME_ON=new Set(['need','tonight','yourRituals']);
 const modVisible=m=>m.on&&MODS[m.type]&&(!MODS[m.type].ready||MODS[m.type].ready());
 V.home={html(){const s=S.settings;const mods=s.home.filter(modVisible).map(m=>MODS[m.type].html()).filter(Boolean).join('');
-  return `<header class="hd home-hd"><div class="hd-main"><h1 class="brand">${esc(s.name||'Body Oracle')}</h1><p class="sub">${fmt.dayLong(Date.now())} <span class="moon" title="${moonName()}" aria-label="${moonName()}">${moonSVG()}</span></p></div></header>
+  return `<header class="hd home-hd"><div class="hd-main"><h1 class="brand">${esc(s.name||'Body Oracle')}</h1><p class="sub">${fmt.dayLong(Date.now())} <span class="moon" title="${moonName()}" aria-label="${moonName()}">${moonSVG()}</span></p></div><button class="ibtn" data-a="go" data-to="settings" aria-label="Settings">${ico('settings',22)}</button></header>
   <div class="stack">${mods||`<button class="add-big" data-a="radial">${ico('plus',20)}<span>Add something</span></button>`}</div>`;}};
 
 /* ================= MAP ================= */
@@ -703,12 +795,12 @@ function filterList(){const f=[{k:'all',l:'All'},{k:'photos',l:'Photos'},{k:'sta
   const es=entries();return f.filter(x=>x.k==='all'||x.k===MS.filter||es.some(e=>match(e,x.k)));}
 function match(e,f){if(f==='all')return true;if(f==='photos')return(e.photoIds||[]).some(id=>IMG.get(id));if(f==='states')return(e.stateIds||[]).length>0;if(f==='intentions')return e.kind==='intention'||e.kind==='sign'||!!e.intentionId;
   const [t,v]=f.split(':');if(t==='kind')return e.kind===v;if(t==='cat')return(e.categoryIds||[]).includes(v);if(t==='th')return(e.threadIds||[]).includes(v);return true;}
-V.map={html(){
+V.map={html(){return head('Map',{back:true})+mapBody();}};
+function mapBody(){
   const fl=filterList();if(!fl.some(x=>x.k===MS.filter))MS.filter='all';
   const es=entries().filter(e=>match(e,MS.filter));
   const chips=`<div class="chips scroll">${fl.map(x=>`<button class="chip ${MS.filter===x.k?'on':''}" data-a="mapFilter" data-f="${x.k}">${x.c?`<i class="dot" style="--c:${x.c}"></i>`:''}${esc(x.l)}</button>`).join('')}</div>`;
-  const top=head('Map',{right:`<button class="ibtn" data-a="searchAll" aria-label="Search">${ico('search')}</button>`})+`<div class="seg" role="tablist"><button class="${MS.mode==='timeline'?'on':''}" data-a="mapMode" data-m="timeline">Timeline</button><button class="${MS.mode==='calendar'?'on':''}" data-a="mapMode" data-m="calendar">Calendar</button></div>`+chips;
-  return top+(MS.mode==='calendar'?calendarHTML(es):timelineHTML(es));}};
+  return chips+(MS.mode==='calendar'?calendarHTML(es):timelineHTML(es));}
 function timelineHTML(es){
   if(!es.length)return MS.filter==='all'?`<button class="empty-cta" data-a="radial">Your map is empty. Each entry you add appears here under its date. Tap + to add the first one.</button>`:`<p class="empty">Nothing here yet for this filter.</p>`;
   const groups=new Map();es.forEach(e=>{const k=dkey(e.date);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(e);});
@@ -855,7 +947,7 @@ V.body={nav:false,html({draft:d}){const b=d.body;const isNew=!S.items.has(d.id);
 /* ================= THREADS ================= */
 const TS={sort:'rel'};
 V.threads={html(){const th=TS.sort==='az'?all('thread').sort((a,b)=>a.name.localeCompare(b.name)):threadsByRelevance();
-  return `${head('Threads',{right:`<button class="ibtn" data-a="new" data-t="thread" aria-label="New thread">${ico('plus')}</button>`})}
+  return `${head('Threads',{back:true,right:`<button class="ibtn" data-a="new" data-t="thread" aria-label="New thread">${ico('plus')}</button>`})}
   <div class="seg"><button class="${TS.sort==='rel'?'on':''}" data-a="threadSort" data-v="rel">Relevance</button><button class="${TS.sort==='az'?'on':''}" data-a="threadSort" data-v="az">A–Z</button></div>
   ${th.length?`<div class="list card">${th.map(threadRow).join('')}</div>`:`<button class="empty-cta" data-a="new" data-t="thread">No threads yet. A thread is a long-running part of your life: My Body, Germany, Becoming Her. Tap to create one.</button>`}`;}};
 V.thread={html({id}){const t=get(id);if(!t)return head('Not found',{back:true});
@@ -880,14 +972,13 @@ V.threadEdit={nav:false,html({draft:d}){const isNew=!S.items.has(d.id);return `$
   ${isNew?'':`<button class="danger-link" data-a="delThread" data-id="${d.id}">Delete thread</button>`}`;}};
 
 /* ================= ARCHIVE ================= */
-const AS={filter:'all',q:''};
+const AS={filter:'all',q:'',view:'grid'};
 const ARCH_F=[['all','All'],['photos','Photos'],['notes','Notes'],['rituals','Rituals'],['signs','Signs'],['intentions','Intentions'],['body','Body'],['dreams','Dreams'],['states','States'],['sigils','Sigils'],['oracle','Oracle'],['threads','Threads']];
 function archItems(){const out=[];
   entries().forEach(e=>{const cats=(e.categoryIds||[]).map(get).filter(Boolean);out.push({g:{note:'notes',mind:'notes',photo:'notes',ritual:'rituals',sign:'signs',intention:'intentions',body:'body',dream:'dreams',state:'states'}[e.kind]||'notes',e,cats:e.categoryIds||[],date:e.date,img:(e.photoIds||[]).find(id=>IMG.get(id)),title:entryLabel(e),text:[e.text,entryLabel(e),e.tags,e.location,...cats.map(c=>c.name),...(e.stateIds||[]).map(get).filter(Boolean).map(s=>s.name)].join(' '),to:'entry',id:e.id,icon:(KINDS[e.kind]||KINDS.note).icon,color:entryColor(e)});});
   all('sigil').forEach(s=>out.push({g:'sigils',date:s.createdAt,img:s.imageId,title:s.name||'Sigil',text:s.name,to:'sigil',id:s.id,sig:true}));
   all('oracle').forEach(o=>out.push({g:'oracle',date:o.date,title:o.noticing||o.name,sub:'Oracle',text:o.name+' '+o.kw+' '+o.text,to:'reading',id:o.id,icon:'oracle'}));
   all('intention').filter(i=>!i.sample).forEach(i=>out.push({g:'intentions',date:i.createdAt,img:i.imageId,title:i.title,sub:'Intention',text:[i.title,i.desire,i.statement,i.reflection].join(' '),to:'intention',id:i.id,icon:'intention'}));
-  all('ritual').filter(r=>!r.sample).forEach(r=>out.push({g:'rituals',date:r.createdAt,img:r.imageId,title:r.name,sub:'Ritual',text:[r.name,r.purpose,(r.steps||[]).join(' ')].join(' '),to:'ritual',id:r.id,icon:'ritual'}));
   all('thread').filter(t=>t.coverId||threadCount(t.id)).forEach(t=>out.push({g:'threads',date:t.createdAt,img:t.coverId,title:t.name,sub:'Thread',text:t.name+' '+(t.description||''),to:'thread',id:t.id,icon:'threads'}));
   return out.sort((a,b)=>(b.date||0)-(a.date||0));}
 function archResults(){let it=archItems();const f=AS.filter;
@@ -896,43 +987,216 @@ function archResults(){let it=archItems();const f=AS.filter;
   const tiles=it.map(x=>{const u=x.img&&IMG.get(x.img);const c=x.e?x.color:'';return `<button class="tile ${x.sig?'sig':''} ${c&&!u?'txt':''}" ${c?`style="--c:${c}"`:''} data-a="go" data-to="${x.to}" data-p="${jp({id:x.id})}" aria-label="${esc(x.title)}">${u?`<img src="${u}" alt="" loading="lazy">${c?tdot(c):''}`:`<span class="tile-t">${esc(x.title)}</span>${x.sub?`<span class="tile-s">${esc(x.sub)}</span>`:`<span class="tile-k">${ico(x.icon||'note',14)}</span>`}`}</button>`;});
   if(!q&&f==='all')tiles.unshift(`<button class="tile add" data-a="radial" aria-label="Add">${ico('plus',22)}</button>`);
   return tiles.length?`<div class="grid3">${tiles.join('')}</div>`:`<p class="empty">${q?'Nothing matches that search.':'Nothing here yet.'}</p>`;}
-V.archive={html(){const items=archItems();const has=new Set(items.map(x=>x.g));if(items.some(x=>x.e&&x.img))has.add('photos');const cats=ordered('category').filter(c=>items.some(x=>(x.cats||[]).includes(c.id)));return `${head('Archive')}
+V.archive={html(){const top=`${head('Archive',{right:`<button class="ibtn" data-a="go" data-to="threads" aria-label="Threads">${ico('threads')}</button>`})}<p class="hint">What actually happened.</p>
+  <div class="seg" role="tablist">${[['grid','Grid'],['timeline','Timeline'],['calendar','Calendar']].map(([k,l])=>`<button class="${AS.view===k?'on':''}" data-a="archView" data-v="${k}">${l}</button>`).join('')}</div>`;
+  if(AS.view!=='grid'){MS.mode=AS.view;return top+mapBody();}
+  const items=archItems();const has=new Set(items.map(x=>x.g));if(items.some(x=>x.e&&x.img))has.add('photos');const cats=ordered('category').filter(c=>items.some(x=>(x.cats||[]).includes(c.id)));return `${top}
   <div class="search">${ico('search',18)}<input id="arch-q" class="search-in" type="search" placeholder="Search your archive" value="${esc(AS.q)}" autocomplete="off"></div>
   <div class="chips scroll">${ARCH_F.filter(([k])=>k==='all'||k===AS.filter||has.has(k)).map(([k,l])=>`<button class="chip ${AS.filter===k?'on':''}" data-a="archFilter" data-f="${k}">${l}</button>`).join('')}${cats.map(c=>`<button class="chip ${AS.filter==='cat:'+c.id?'on':''}" data-a="archFilter" data-f="cat:${c.id}"><i class="dot" style="--c:${c.color}"></i>${esc(c.name)}</button>`).join('')}</div>
   <div id="arch-res">${archResults()}</div>`;}};
 
 /* ================= RITUALS ================= */
-const RS={f:'all'};
-const ritCard=r=>`<button class="rcard" data-a="go" data-to="ritual" data-p="${jp({id:r.id})}"><span class="rimg ${IMG.get(r.imageId)?'has':''}">${imgTag(r.imageId)||ico('candle',26)}</span><span class="rname">${esc(r.name)}</span>${r.purpose?`<span class="rsub">${esc(r.purpose)}</span>`:''}${r.duration?`<span class="rsub">${esc(r.duration)}</span>`:''}</button>`;
-V.rituals={html(){const rs=ordered('ritual');const groups=[...new Set(rs.map(r=>r.group).filter(Boolean))];
-  let list=rs;if(RS.f==='mine')list=rs.filter(r=>!r.sample);else if(RS.f==='tpl')list=rs.filter(r=>r.sample);else if(RS.f!=='all')list=rs.filter(r=>r.group===RS.f);
-  return `${head('Rituals',{back:true,right:`<button class="ibtn" data-a="new" data-t="ritual" aria-label="New ritual">${ico('plus')}</button>`})}
-  <div class="chips scroll">${[['all','All'],['mine','My rituals'],['tpl','Templates'],...groups.map(g=>[g,g])].map(([k,l])=>`<button class="chip ${RS.f===k?'on':''}" data-a="ritFilter" data-f="${esc(k)}">${esc(l)}</button>`).join('')}</div>
-  ${list.length?`<div class="grid2">${list.map(ritCard).join('')}</div>`:`<button class="empty-cta" data-a="new" data-t="ritual">${RS.f==='mine'?'You have not written a ritual of your own yet. Tap to create one.':'No rituals here.'}</button>`}`;}};
-V.ritual={quiet:true,html({id}){const r=get(id);if(!r)return head('Not found',{back:true});const it=get(r.intentionId),th=get(r.threadId),sg=get(r.sigilId);
-  const done=all('entry').filter(e=>e.kind==='ritual'&&e.ritualId===id).sort((a,b)=>b.date-a.date);
-  return `${head('',{back:true,right:`<button class="ibtn" data-a="editRitual" data-id="${id}" aria-label="Edit ritual">${ico('edit',20)}</button>`})}
-  ${slot(r.imageId,`item:${id}:imageId`,'4/3')}
-  <h1 class="rit-name">${esc(r.name)}</h1><p class="rit-sub">${[r.purpose,r.duration].filter(Boolean).map(esc).join(' · ')}</p>
-  ${r.sample?`<p class="fine" style="margin-top:0">Template. Edit it freely or write your own.</p>`:''}
-  ${(r.steps||[]).filter(s=>s.trim()).length?`<ol class="rit-steps">${r.steps.filter(s=>s.trim()).map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`:'<p class="empty" style="margin:20px 0">No steps written yet.</p>'}
-  ${sg&&IMG.get(sg.imageId)?`<div style="display:flex;justify-content:center;margin-bottom:18px"><div class="sigil-sm">${imgTag(sg.imageId)}</div></div>`:''}
-  <button class="btn" data-a="ritualDone" data-id="${id}">I did this ritual</button>
-  ${it||th?`<div class="list card mt">${it?`<button class="row" data-a="go" data-to="intention" data-p="${jp({id:it.id})}"><span class="row-i">${ico('intention',18)}</span><span class="row-m"><span class="row-s">Intention</span><span class="row-t">${esc(it.title)}</span></span>${ico('chev',16)}</button>`:''}${th?`<button class="row" data-a="go" data-to="thread" data-p="${jp({id:th.id})}"><span class="row-i">${ico('threads',18)}</span><span class="row-m"><span class="row-s">Thread</span><span class="row-t">${esc(th.name)}</span></span>${ico('chev',16)}</button>`:''}</div>`:''}
-  ${done.length?`<div class="sec-h mt"><h2 class="sec-t">Times you did it</h2></div><div class="lines">${done.slice(0,10).map(e=>lineRow(e,true)).join('')}</div>`:''}`;}};
-V.ritualEdit={nav:false,html({draft:d}){const isNew=!S.items.has(d.id);const steps=d.steps||[];return `${edHead(isNew?'New ritual':'Edit ritual','saveRitual')}
-  ${slot(d.imageId,'draft:imageId','4/3')}
-  <span class="lbl">Name</span><input class="field" id="r-name" data-bind="name" value="${esc(d.name||'')}" placeholder="e.g. The Cleansing Rite">
-  <span class="lbl">Purpose</span><input class="field" id="r-purpose" data-bind="purpose" value="${esc(d.purpose||'')}" placeholder="e.g. Release & reset">
-  <div class="pair"><div><span class="lbl">Duration</span><input class="field" id="r-dur" data-bind="duration" value="${esc(d.duration||'')}" placeholder="10 min"></div><div><span class="lbl">Kind</span><input class="field" id="r-group" data-bind="group" value="${esc(d.group||'')}" placeholder="Cleansing" list="r-groups"><datalist id="r-groups">${[...new Set(all('ritual').map(r=>r.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div></div>
-  <span class="lbl">Steps</span><div class="stepper">${steps.map((s,i)=>`<div class="step"><span class="n">${i+1}</span><input class="field" id="r-step-${i}" data-bind="steps.${i}" value="${esc(s)}" placeholder="Step ${i+1}"><button class="ibtn sm" data-a="delListItem" data-f="steps" data-i="${i}" aria-label="Remove step">${ico('close',15)}</button></div>`).join('')}</div>
-  <button class="addl" data-a="addListItem" data-f="steps">${ico('plus',16)} Add a step</button>
+/* A ritual is prepared now and performed later: when it is for, what it is for, what to have ready, and the sequence itself.
+   Entries record the times it actually happened. */
+const SITUATIONS=['After a difficult day','Before sleep','When I feel disconnected','When I need confidence','When I want to begin again','When I am overwhelmed','When I cannot sleep','Before going out','Before seeing someone','When I want to mark an ending','When I feel rejected','When I need courage'];
+const MOMENTS=['Anxious','Sad','Angry','Lonely','Powerless','Disconnected','Ashamed','Overwhelmed'];
+const newStep=(text='')=>({id:uid(),text,note:'',imageId:null,productId:null,prayerId:null,sound:'',duration:'',check:false});
+const newProduct=()=>({id:uid(),name:'',imageId:null,url:'',price:'',notes:'',have:false});
+function normRitual(r){let ch=false;const fix=(k,v)=>{if(r[k]===undefined){r[k]=v;ch=true;}};
+  if((r.steps||[]).some(s=>typeof s==='string')){r.steps=r.steps.filter(s=>typeof s!=='string'||s.trim()).map(s=>typeof s==='string'?newStep(s):s);ch=true;}
+  fix('steps',[]);fix('situations',[]);fix('intention',r.purpose||'');fix('description','');fix('objects',[]);fix('products',[]);fix('prayerIds',[]);fix('visualIds',[]);
+  fix('tags','');fix('color',null);fix('colorId',null);fix('favourite',false);fix('lastPerformedAt',null);
+  if(r.threadIds===undefined){r.threadIds=r.threadId?[r.threadId]:[];ch=true;}
+  return ch;}
+function normPrayer(p){let ch=false;const fix=(k,v)=>{if(p[k]===undefined){p[k]=v;ch=true;}};
+  fix('situations',[]);fix('text','');fix('imageId',null);fix('tags','');fix('color',null);fix('colorId',null);fix('favourite',false);fix('lastReadAt',null);return ch;}
+const usedSituations=()=>[...new Set([...all('ritual'),...all('prayer')].flatMap(x=>x.situations||[]))];
+const lc=s=>String(s||'').toLowerCase();
+/* a moment matches an item when one of its situations names it, in the person's own wording */
+const fitsMoment=(x,m)=>m==='*'||(x.situations||[]).some(s=>lc(s)===lc(m)||lc(s).includes(lc(m)));
+const prayersOf=r=>(r.prayerIds||[]).map(get).filter(Boolean);
+const ritualsWith=pid=>all('ritual').filter(r=>(r.prayerIds||[]).includes(pid)||(r.steps||[]).some(s=>s.prayerId===pid));
+const byUse=(a,b)=>(b.favourite?1:0)-(a.favourite?1:0)||(b.lastPerformedAt||b.lastReadAt||0)-(a.lastPerformedAt||a.lastReadAt||0)||(b.updatedAt||0)-(a.updatedAt||0);
+const isTonight=(kind,id)=>S.settings.tonight&&S.settings.tonight.kind===kind&&S.settings.tonight.id===id;
+const sitChips=x=>(x.situations||[]).length?`<div class="chips sm">${x.situations.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>`:'';
+
+function situationPicker(d){const sel=d.situations||[];const base=[...(S.settings.situations||SITUATIONS)];
+  const pool=[...new Set([...sel,...usedSituations(),...base,...(d.type==='prayer'?MOMENTS.map(m=>`When I feel ${m.toLowerCase()}`):[])])];
+  const show=d._sitAll?pool:pool.slice(0,Math.max(sel.length+3,8));
+  return `<div class="chips">${show.map(s=>`<button class="chip ${sel.includes(s)?'on':''}" data-a="togSit" data-v="${esc(s)}" aria-pressed="${sel.includes(s)}">${esc(s)}</button>`).join('')}${pool.length>show.length?`<button class="chip dashed" data-a="sitAll">More…</button>`:''}<button class="chip dashed" data-a="newSit">+ Your own situation</button></div>`;}
+
+const ritCard=r=>`<button class="rcard" data-a="go" data-to="ritual" data-p="${jp({id:r.id})}"><span class="rimg ${IMG.get(r.imageId)?'has':''}" ${r.color?`style="--c:${r.color}"`:''}>${imgTag(r.imageId)||ico('candle',26)}${r.color?tdot(r.color):''}</span><span class="rname">${esc(r.name)}</span>${(r.situations||[])[0]?`<span class="rsub">${esc(r.situations[0])}</span>`:r.duration?`<span class="rsub">${esc(r.duration)}</span>`:''}</button>`;
+const RS={f:'all',q:''};
+V.rituals={html(){const rs=all('ritual').sort(byUse);const themes=[...new Set(rs.map(r=>r.group).filter(Boolean))];const sits=usedSituations();
+  if(RS.f!=='all'&&RS.f!=='fav'&&RS.f!=='mine'&&!themes.includes(RS.f)&&!sits.includes(RS.f))RS.f='all';
+  let list=rs;if(RS.f==='fav')list=rs.filter(r=>r.favourite);else if(RS.f==='mine')list=rs.filter(r=>!r.sample);else if(themes.includes(RS.f))list=rs.filter(r=>r.group===RS.f);else if(RS.f!=='all')list=rs.filter(r=>(r.situations||[]).includes(RS.f));
+  const opts=[['all','All'],...(rs.some(r=>r.favourite)?[['fav','Favourites']]:[]),...(rs.some(r=>r.sample)&&rs.some(r=>!r.sample)?[['mine','Mine']]:[]),...themes.map(g=>[g,g]),...sits.map(s=>[s,s])];
+  return `${head('Rituals',{right:`<button class="ibtn" data-a="new" data-t="ritual" aria-label="New ritual">${ico('plus')}</button>`})}
+  <p class="hint">Things you do, prepared for the moments that come back.</p>
+  ${rs.length?`<div class="chips scroll">${opts.map(([k,l])=>`<button class="chip ${RS.f===k?'on':''}" data-a="ritFilter" data-f="${esc(k)}">${esc(l)}</button>`).join('')}</div>`:''}
+  ${list.length?`<div class="grid2">${list.map(ritCard).join('')}</div>`:''}
+  <button class="empty-cta mt" data-a="new" data-t="ritual">${ico('plus',16)} Create a ritual for a moment you know will come again</button>`;}};
+
+/* ---- ritual page ---- */
+function needList(r,{interactive=true}={}){const objs=r.objects||[],prods=r.products||[];if(!objs.length&&!prods.length)return'';
+  const ck=(k,i,on)=>interactive?`<button class="ck ${on?'on':''}" data-a="togHave" data-id="${r.id}" data-k="${k}" data-i="${i}" aria-label="${on?'Ready':'Not ready yet'}">${on?ico('check',14):''}</button>`:'';
+  return `<div class="list card need">${objs.map((o,i)=>`<div class="row ${o.have?'have':''}">${ck('objects',i,o.have)}<span class="row-m"><span class="row-t">${esc(o.name)}</span></span></div>`).join('')}
+   ${prods.map((p,i)=>`<div class="row ${p.have?'have':''}">${ck('products',i,p.have)}<button class="row-m btn-plain prod-r" data-a="go" data-to="product" data-p="${jp({id:r.id,pid:p.id})}"><span class="pthumb">${imgTag(p.imageId)||ico('bag',18)}</span><span class="row-m"><span class="row-t">${esc(p.name||'Product')}</span>${p.price||p.notes?`<span class="row-s">${esc([p.price,p.notes].filter(Boolean).join(' · '))}</span>`:''}</span></button>${p.url?`<a class="ibtn sm" href="${esc(p.url)}" target="_blank" rel="noopener" aria-label="Open link">${ico('link',16)}</a>`:''}</div>`).join('')}</div>`;}
+function stepBadges(s,r){const b=[];if(s.imageId&&IMG.get(s.imageId))b.push(`<span class="bdg img">${imgTag(s.imageId)}</span>`);
+  if(s.duration)b.push(`<span class="bdg">${ico('clock',12)}${esc(s.duration)}</span>`);
+  const pr=(r.products||[]).find(p=>p.id===s.productId);if(pr)b.push(`<span class="bdg">${ico('bag',12)}${esc(pr.name||'Product')}</span>`);
+  const py=get(s.prayerId);if(py)b.push(`<span class="bdg">${ico('prayer',12)}${esc(py.name)}</span>`);
+  if(s.sound)b.push(`<span class="bdg">${ico('music',12)}${esc(s.sound.length>22?s.sound.slice(0,21)+'…':s.sound)}</span>`);
+  if(s.note)b.push(`<span class="bdg">${ico('note',12)}Note</span>`);
+  return b.length?`<span class="bdgs">${b.join('')}</span>`:'';}
+V.ritual={quiet:true,html({id}){const r=get(id);if(!r)return head('Not found',{back:true});const it=get(r.intentionId),sg=get(r.sigilId);const ths=(r.threadIds||[]).map(get).filter(Boolean);
+  const done=all('entry').filter(e=>e.kind==='ritual'&&e.ritualId===id).sort((a,b)=>b.date-a.date);const steps=(r.steps||[]).filter(s=>s.text.trim()||s.imageId);const prs=prayersOf(r);const vis=(r.visualIds||[]).filter(v=>IMG.get(v));
+  return `${head('',{back:true,right:`<button class="ibtn ${r.favourite?'fav':''}" data-a="togFav" data-id="${id}" aria-label="${r.favourite?'Remove from favourites':'Add to favourites'}" aria-pressed="${!!r.favourite}">${ico('star',20)}</button><button class="ibtn" data-a="editRitual" data-id="${id}" aria-label="Edit ritual">${ico('edit',20)}</button>`})}
+  ${slot(r.imageId,`item:${id}:imageId`,'16/10',r.imageId?'':'compact')}
+  <h1 class="obj-name" ${r.color?`style="--c:${r.color}"`:''}>${esc(r.name)}</h1>
+  ${(r.situations||[]).length?`<p class="eyebrow">For</p>${sitChips(r)}`:''}
+  ${r.intention?`<p class="obj-int">${esc(r.intention)}</p>`:''}
+  ${r.sample?`<p class="fine" style="text-align:left;margin:10px 0 0">An example. Edit it freely, or write your own.</p>`:''}
+  <div class="obj-act"><button class="btn" data-a="go" data-to="run" data-p="${jp({id,i:-1})}" ${steps.length?'':'disabled'}>${ico('play',16)} Begin ritual</button><button class="btn ghost" data-a="keepTonight" data-kind="ritual" data-id="${id}">${ico('intention',16)} ${isTonight('ritual',id)?'Kept for tonight':'Keep for tonight'}</button></div>
+  ${(r.objects||[]).length||(r.products||[]).length?`<div class="sec-h mt"><h2 class="sec-t">Things to prepare</h2></div>${needList(r)}`:''}
+  ${vis.length?`<div class="sec-h mt"><h2 class="sec-t">Visual references</h2></div><div class="grid3">${vis.map(v=>`<div class="tile"><img src="${IMG.get(v)}" alt=""></div>`).join('')}</div>`:''}
+  <div class="sec-h mt"><h2 class="sec-t">The ritual</h2>${r.duration?`<span class="muted" style="font-size:13px">${esc(r.duration)}</span>`:''}</div>
+  ${steps.length?`<ol class="rit-steps">${steps.map(s=>`<li><span>${esc(s.text)}${stepBadges(s,r)}</span></li>`).join('')}</ol>`:`<button class="empty-cta" data-a="editRitual" data-id="${id}">No steps yet. Tap to write the sequence.</button>`}
+  ${prs.length?`<div class="sec-h mt"><h2 class="sec-t">Prayers</h2></div><div class="list card">${prs.map(prayerRow).join('')}</div>`:''}
+  ${sg&&IMG.get(sg.imageId)?`<div class="sec-h mt"><h2 class="sec-t">Symbol</h2></div><div class="sigil-sm">${imgTag(sg.imageId)}</div>`:''}
+  ${it||ths.length?`<div class="list card mt">${it?`<button class="row" data-a="go" data-to="intention" data-p="${jp({id:it.id})}"><span class="row-i">${ico('intention',18)}</span><span class="row-m"><span class="row-s">Intention</span><span class="row-t">${esc(it.title)}</span></span>${ico('chev',16)}</button>`:''}${ths.map(th=>`<button class="row" data-a="go" data-to="thread" data-p="${jp({id:th.id})}"><span class="row-i">${ico('threads',18)}</span><span class="row-m"><span class="row-s">Thread</span><span class="row-t">${esc(th.name)}</span></span>${ico('chev',16)}</button>`).join('')}</div>`:''}
+  <div class="sec-h mt"><h2 class="sec-t">Times you did it</h2><button class="lnk" data-a="ritualDone" data-id="${id}">Record without guiding</button></div>
+  ${done.length?`<div class="lines">${done.slice(0,10).map(e=>lineRow(e,true)).join('')}</div>`:`<p class="empty">Not yet.</p>`}`;}};
+V.product={html({id,pid}){const r=get(id);const p=r&&(r.products||[]).find(x=>x.id===pid);if(!p)return head('Not found',{back:true});
+  return `${head('',{back:true})}${IMG.get(p.imageId)?`<div class="prod-img"><div class="tile">${imgTag(p.imageId)}</div></div>`:''}
+  <h1 class="obj-name">${esc(p.name||'Product')}</h1>${p.price?`<p class="muted" style="margin:0 0 10px">${esc(p.price)}</p>`:''}
+  ${p.notes?`<p class="obj-int">${esc(p.notes)}</p>`:''}
+  ${p.url?`<a class="btn ghost mt" href="${esc(p.url)}" target="_blank" rel="noopener">${ico('link',16)} Open link</a>`:''}
+  <p class="fine">Part of ${esc(r.name)}. Edit it from the ritual.</p>`;}};
+
+/* ---- ritual builder ---- */
+V.ritualEdit={nav:false,html({draft:d}){const isNew=!S.items.has(d.id);const steps=d.steps||[],objs=d.objects||[],prods=d.products||[];const prs=(d.prayerIds||[]).map(get).filter(Boolean);
+  return `${edHead(isNew?'New ritual':'Edit ritual','saveRitual')}
+  ${slot(d.imageId,'draft:imageId','16/10',d.imageId?'':'compact')}
+  <input class="field title-in" id="r-name" data-bind="name" value="${esc(d.name||'')}" placeholder="Name this ritual" autocomplete="off">
+  <span class="lbl">When is this for?</span>${situationPicker(d)}
+  <span class="lbl">Intention</span><textarea class="field area sm" id="r-int" data-bind="intention" placeholder="What is this ritual for?">${esc(d.intention||'')}</textarea>
+  <span class="lbl">What you need</span>
+  ${objs.length||prods.length?`<div class="list card">${objs.map((o,i)=>`<div class="row"><span class="row-i">${ico('candle',18)}</span><button class="row-m btn-plain" data-a="editObject" data-i="${i}">${esc(o.name)}</button><button class="ibtn sm" data-a="delListItem" data-f="objects" data-i="${i}" aria-label="Remove ${esc(o.name)}">${ico('close',15)}</button></div>`).join('')}
+   ${prods.map((p,i)=>`<button class="row" data-a="editProduct" data-i="${i}"><span class="pthumb">${imgTag(p.imageId)||ico('bag',18)}</span><span class="row-m"><span class="row-t">${esc(p.name||'Untitled product')}</span>${p.price?`<span class="row-s">${esc(p.price)}</span>`:''}</span>${ico('chev',16)}</button>`).join('')}</div>`:`<p class="hint">Objects to gather and things you might buy. When it is time, everything is here.</p>`}
+  <div class="pair mt-s"><button class="btn ghost sm" data-a="addObject">${ico('plus',16)} Object</button><button class="btn ghost sm" data-a="addProduct">${ico('plus',16)} Product</button></div>
+  <span class="lbl">Visual references</span><div class="grid4">${(d.visualIds||[]).map((v,i)=>`<div>${slot(v,`draft:visualIds:${i}`,'1/1')}</div>`).join('')}<div>${slot(null,'draft:visualIds:new','1/1')}</div></div>
+  <span class="lbl">The ritual</span>
+  <div class="steps sortable" data-sort="steps">${steps.map((s,i)=>`<div class="srow stp" data-id="${s.id}"><span class="n">${i+1}</span><div class="stp-m"><textarea class="field stp-t" id="st-${s.id}" rows="1" data-bind="steps.${i}.text" placeholder="Step ${i+1}">${esc(s.text)}</textarea>${stepBadges(s,d)}</div><button class="ibtn sm" data-a="editStep" data-i="${i}" aria-label="Add an image, note, product, prayer, sound or duration to step ${i+1}">${ico('more',18)}</button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}</div>
+  <button class="addl" data-a="addStep">${ico('plus',16)} Add a step</button>
+  <span class="lbl">Prayers</span>${prs.length?`<div class="list card">${prs.map(p=>`<div class="row"><span class="row-i">${ico('prayer',18)}</span><span class="row-m">${esc(p.name)}</span><button class="ibtn sm" data-a="unlinkPrayer" data-id="${p.id}" aria-label="Detach ${esc(p.name)}">${ico('close',15)}</button></div>`).join('')}</div>`:''}
+  <button class="addl" data-a="attachPrayer">${ico('plus',16)} Attach a prayer</button>
+  <button class="more-t" data-a="togMore" aria-expanded="${!!d._more}">More ${ico(d._more?'up':'down',14)}</button>
+  ${d._more?`<div class="more-b">
+   <div class="pair"><div><span class="lbl" style="margin-top:4px">Theme</span><input class="field" id="r-group" data-bind="group" value="${esc(d.group||'')}" placeholder="e.g. Confidence" list="r-groups"><datalist id="r-groups">${[...new Set(all('ritual').map(r=>r.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div><div><span class="lbl" style="margin-top:4px">Duration</span><input class="field" id="r-dur" data-bind="duration" value="${esc(d.duration||'')}" placeholder="e.g. 20 min"></div></div>
+   <span class="lbl">Colour</span>${entryColorPicker(d)}
+   <div class="list card mt">
+    ${rowBtn('threads','Threads',(d.threadIds||[]).map(get).filter(Boolean).map(t=>t.name).join(', ')||'None','pickThreads')}
+    ${rowBtn('intention','Intention',get(d.intentionId)?.title||'None','pickOne','data-f="intentionId" data-type="intention" data-title="Link to an intention"')}
+    ${rowBtn('pen','Symbol',get(d.sigilId)?.name||'None','pickSigil')}
+    <label class="row"><span class="row-i">${ico('tag',18)}</span><span class="row-m">Tags</span><input class="inl" id="r-tags" data-bind="tags" value="${esc(d.tags||'')}" placeholder="Add tags"></label>
+   </div></div>`:''}
+  ${isNew?'':`<button class="danger-link" data-a="delRitual" data-id="${d.id}">Delete ritual</button>`}`;},
+  after(){bindSortables();$$('.stp-t').forEach(autoGrow);}};
+function autoGrow(t){const f=()=>{t.style.height='auto';t.style.height=t.scrollHeight+'px';};f();t.addEventListener('input',f);}
+V.stepEdit={nav:false,html({draft:d,i}){const s=(d.steps||[])[i];if(!s)return head('',{back:true});const pr=(d.products||[]).find(p=>p.id===s.productId),py=get(s.prayerId);
+  return `<header class="ed-hd"><span style="width:60px"></span><span class="ed-t">Step ${i+1}</span><button class="tbtn strong" data-a="back">Done</button></header>
+  <textarea class="field area sm" id="se-text" data-bind="steps.${i}.text" placeholder="What happens in this step?">${esc(s.text)}</textarea>
+  <span class="lbl">Image</span>${slot(s.imageId,`dpath:steps.${i}.imageId`,'4/3',s.imageId?'':'compact')}
+  <span class="lbl">Note</span><textarea class="field area sm" id="se-note" data-bind="steps.${i}.note" placeholder="Anything to remember while doing it">${esc(s.note||'')}</textarea>
+  <div class="pair"><div><span class="lbl">Duration</span><input class="field" id="se-dur" data-bind="steps.${i}.duration" value="${esc(s.duration||'')}" placeholder="e.g. 5 min"></div><div><span class="lbl">Sound or music</span><input class="field" id="se-snd" data-bind="steps.${i}.sound" value="${esc(s.sound||'')}" placeholder="Song or link"></div></div>
   <div class="list card mt">
-   ${rowBtn('threads','Thread',get(d.threadId)?.name||'None','pickOne','data-f="threadId" data-type="thread" data-title="Link to a thread"')}
-   ${rowBtn('intention','Intention',get(d.intentionId)?.title||'None','pickOne','data-f="intentionId" data-type="intention" data-title="Link to an intention"')}
-   ${rowBtn('pen','Symbol',get(d.sigilId)?.name||'None','pickSigil')}
+   ${rowBtn('bag','Product',pr?(pr.name||'Product'):'None','pickStepProduct',`data-i="${i}"`)}
+   ${rowBtn('prayer','Prayer',py?py.name:'None','pickStepPrayer',`data-i="${i}"`)}
+   <div class="row"><span class="row-i">${ico('check',18)}</span><span class="row-m">Check it off when done</span><button class="tog ${s.check?'on':''}" data-a="togStepCheck" data-i="${i}" role="switch" aria-checked="${!!s.check}" aria-label="Check it off when done"><i></i></button></div>
   </div>
-  ${isNew?'':`<button class="danger-link" data-a="delRitual" data-id="${d.id}">Delete ritual</button>`}`;}};
+  <button class="danger-link" data-a="delStep" data-i="${i}">Remove step</button>`;}};
+V.productEdit={nav:false,html({draft:d,i}){const p=(d.products||[])[i];if(!p)return head('',{back:true});
+  return `<header class="ed-hd"><span style="width:60px"></span><span class="ed-t">Product</span><button class="tbtn strong" data-a="doneProduct" data-i="${i}">Done</button></header>
+  <div class="prod-img">${slot(p.imageId,`dpath:products.${i}.imageId`,'1/1')}</div>
+  <span class="lbl">Name</span><input class="field" id="pe-name" data-bind="products.${i}.name" value="${esc(p.name||'')}" placeholder="e.g. Lavender candle" autocomplete="off">
+  <span class="lbl">Link</span><input class="field" id="pe-url" type="url" inputmode="url" data-bind="products.${i}.url" value="${esc(p.url||'')}" placeholder="https://">
+  <span class="lbl">Price</span><input class="field" id="pe-price" data-bind="products.${i}.price" value="${esc(p.price||'')}" placeholder="e.g. €24">
+  <span class="lbl">Why I want it</span><textarea class="field area sm" id="pe-notes" data-bind="products.${i}.notes" placeholder="e.g. Wear this during the ritual because I associate it with becoming softer.">${esc(p.notes||'')}</textarea>
+  <button class="danger-link" data-a="delProduct" data-i="${i}">Remove product</button>`;}};
+
+/* ---- ritual mode: one step at a time, nothing else on screen ---- */
+const RUN={timer:null,end:0};
+function stopTimer(){clearInterval(RUN.timer);RUN.timer=null;RUN.end=0;}
+function parseMinutes(s){const m=/(\d+(?:[.,]\d+)?)\s*(s|sec|m|min|h|hr)?/i.exec(s||'');if(!m)return 0;const n=parseFloat(m[1].replace(',','.'));const u=lc(m[2]||'min');return u.startsWith('s')?n/60:u.startsWith('h')?n*60:n;}
+V.run={nav:false,html(p){const r=get(p.id);if(!r)return head('Not found',{back:true});const steps=(r.steps||[]).filter(s=>s.text.trim()||s.imageId);const n=steps.length;const i=p.i;
+  const top=`<header class="run-hd"><button class="ibtn" data-a="runExit" aria-label="Leave ritual">${ico('close',20)}</button><span class="run-p">${i<0?'':i>=n?'Complete':`${i+1} of ${n}`}</span><span style="width:40px"></span></header><div class="run-bar"><i style="width:${Math.max(0,Math.min(1,(i+1)/n))*100}%"></i></div>`;
+  if(i<0)return `<div class="run">${top}<div class="run-body"><p class="eyebrow">Ritual</p><h1 class="run-t">${esc(r.name)}</h1>${r.intention?`<p class="obj-int">${esc(r.intention)}</p>`:''}
+    ${(r.objects||[]).length||(r.products||[]).length?`<p class="eyebrow mt">Have everything?</p>${needList(r)}`:''}</div><div class="run-foot"><button class="btn" data-a="runGo" data-d="1">Begin</button></div></div>`;
+  if(i>=n)return `<div class="run">${top}<div class="run-body"><p class="eyebrow">${esc(r.name)}</p><h1 class="run-t">Complete.</h1>
+    <span class="lbl">Anything you want to remember?</span><textarea class="field area sm" id="run-note" placeholder="How it felt, what you left behind">${esc(p.note||'')}</textarea></div>
+    <div class="run-foot"><button class="btn" data-a="runSave">Save to archive</button><button class="tbtn" data-a="runClose">Close without saving</button></div></div>`;
+  const s=steps[i];const pr=(r.products||[]).find(x=>x.id===s.productId),py=get(s.prayerId);const mins=parseMinutes(s.duration);const url=/^https?:\/\//i.test(s.sound||'');
+  return `<div class="run">${top}<div class="run-body">
+   ${s.imageId&&IMG.get(s.imageId)?`<div class="run-img">${imgTag(s.imageId)}</div>`:''}
+   <h1 class="run-step">${esc(s.text)}</h1>
+   ${s.note?`<p class="obj-int">${esc(s.note)}</p>`:''}
+   ${pr?`<div class="list card mt"><div class="row"><span class="pthumb">${imgTag(pr.imageId)||ico('bag',18)}</span><span class="row-m"><span class="row-t">${esc(pr.name||'Product')}</span>${pr.notes?`<span class="row-s">${esc(pr.notes)}</span>`:''}</span></div></div>`:''}
+   ${s.sound?`<p class="run-meta">${ico('music',16)} ${url?`<a href="${esc(s.sound)}" target="_blank" rel="noopener">${esc(s.sound)}</a>`:esc(s.sound)}</p>`:''}
+   ${s.duration?`<p class="run-meta">${ico('clock',16)} ${esc(s.duration)} ${mins>0?`<button class="tbtn" data-a="runTimer" data-m="${mins}"><span id="run-tmr">${RUN.end?'':'Start timer'}</span></button>`:''}</p>`:''}
+   ${py?`<button class="btn ghost mt" data-a="go" data-to="prayer" data-p="${jp({id:py.id})}">${ico('prayer',16)} Read prayer</button>`:''}
+  </div><div class="run-foot"><button class="btn" data-a="runGo" data-d="1">${s.check?`${ico('check',16)} Done`:i===n-1?'Finish':'Next'}</button>${i>0?`<button class="tbtn" data-a="runGo" data-d="-1">Previous step</button>`:''}</div></div>`;},
+  after(){if(RUN.end)tick();}};
+function tick(){const el=$('#run-tmr');if(!el){stopTimer();return;}const left=Math.max(0,RUN.end-Date.now());const m=Math.floor(left/6e4),sec=Math.floor(left%6e4/1e3);el.textContent=left?`${m}:${pad(sec)}`:'Time';if(!left){stopTimer();if(navigator.vibrate)try{navigator.vibrate([60,40,60]);}catch(e){}}}
+
+/* ================= PRAYERS ================= */
+/* Words written ahead of time for a state you know you will be in again. Never generated, always the person's own. */
+const prayerRow=p=>`<button class="row" data-a="go" data-to="prayer" data-p="${jp({id:p.id})}"><span class="pthumb" ${p.color?`style="--c:${p.color}"`:''}>${imgTag(p.imageId)||`<i class="dot" style="--c:${p.color||'var(--muted)'}"></i>`}</span><span class="row-m"><span class="row-t">${esc(p.name)}</span><span class="row-s">${esc((p.situations||[])[0]||(p.text||'').split('\n')[0])}</span></span>${ico('chev',16)}</button>`;
+const PS={f:'all'};
+V.prayers={html(){const ps=all('prayer').sort(byUse);const sits=[...new Set(ps.flatMap(p=>p.situations||[]))];if(PS.f!=='all'&&PS.f!=='fav'&&!sits.includes(PS.f))PS.f='all';
+  const list=PS.f==='all'?ps:PS.f==='fav'?ps.filter(p=>p.favourite):ps.filter(p=>(p.situations||[]).includes(PS.f));
+  return `${head('Prayers',{right:`<button class="ibtn" data-a="new" data-t="prayer" aria-label="New prayer">${ico('plus')}</button>`})}
+  <p class="hint">Words you return to when you are in a particular state.</p>
+  ${ps.length?`<div class="chips scroll">${[['all','All'],...(ps.some(p=>p.favourite)?[['fav','Favourites']]:[]),...sits.map(s=>[s,s])].map(([k,l])=>`<button class="chip ${PS.f===k?'on':''}" data-a="prayFilter" data-f="${esc(k)}">${esc(l)}</button>`).join('')}</div>`:''}
+  ${list.length?`<div class="list card">${list.map(prayerRow).join('')}</div>`:''}
+  <button class="empty-cta mt" data-a="new" data-t="prayer">${ico('plus',16)} Write words for a moment you know will come again</button>`;}};
+V.prayer={quiet:true,html({id}){const p=get(id);if(!p)return head('Not found',{back:true});const rs=ritualsWith(id);
+  return `${head('',{back:true,right:`<button class="ibtn ${p.favourite?'fav':''}" data-a="togFav" data-id="${id}" aria-label="${p.favourite?'Remove from favourites':'Add to favourites'}" aria-pressed="${!!p.favourite}">${ico('star',20)}</button><button class="ibtn" data-a="editPrayer" data-id="${id}" aria-label="Edit prayer">${ico('edit',20)}</button>`})}
+  ${IMG.get(p.imageId)?`<div class="pray-img">${slot(p.imageId,`item:${id}:imageId`,'4/3')}</div>`:''}
+  <h1 class="obj-name" ${p.color?`style="--c:${p.color}"`:''}>${esc(p.name)}</h1>
+  ${(p.situations||[]).length?`<p class="eyebrow">When</p>${sitChips(p)}`:''}
+  <div class="pray-text">${esc(p.text||'')}</div>
+  ${p.sample?`<p class="fine" style="text-align:left">An example. Replace it with your own words.</p>`:''}
+  <button class="btn ghost mt" data-a="keepTonight" data-kind="prayer" data-id="${id}">${ico('intention',16)} ${isTonight('prayer',id)?'Kept for tonight':'Keep for tonight'}</button>
+  ${rs.length?`<div class="sec-h mt"><h2 class="sec-t">Part of</h2></div><div class="list card">${rs.map(r=>`<button class="row" data-a="go" data-to="ritual" data-p="${jp({id:r.id})}"><span class="row-i">${ico('ritual',18)}</span><span class="row-m">${esc(r.name)}</span>${ico('chev',16)}</button>`).join('')}</div>`:''}`;},
+  after(p){if(p._read)return;p._read=true;const x=get(p.id);if(x){x.lastReadAt=Date.now();save(x);}}};
+V.prayerEdit={nav:false,html({draft:d}){const isNew=!S.items.has(d.id);const rs=(d._rituals||[]).map(get).filter(Boolean);
+  return `${edHead(isNew?'New prayer':'Edit prayer','savePrayer')}
+  <input class="field title-in" id="p-name" data-bind="name" value="${esc(d.name||'')}" placeholder="Name it, e.g. Read this when I feel unwanted" autocomplete="off">
+  <span class="lbl">When</span>${situationPicker(d)}
+  <span class="lbl">Prayer</span><textarea class="field area pray-in" id="p-text" data-bind="text" placeholder="Your own words">${esc(d.text||'')}</textarea>
+  <span class="lbl">Image</span>${slot(d.imageId,'draft:imageId','4/3',d.imageId?'':'compact')}
+  <span class="lbl">Colour</span>${entryColorPicker(d)}
+  <span class="lbl">Part of rituals</span>${rs.length?`<div class="list card">${rs.map(r=>`<div class="row"><span class="row-i">${ico('ritual',18)}</span><span class="row-m">${esc(r.name)}</span></div>`).join('')}</div>`:''}
+  <button class="addl" data-a="prayerRituals">${ico('plus',16)} ${rs.length?'Change rituals':'Attach to a ritual'}</button>
+  <div class="list card mt"><label class="row"><span class="row-i">${ico('tag',18)}</span><span class="row-m">Tags</span><input class="inl" id="p-tags" data-bind="tags" value="${esc(d.tags||'')}" placeholder="Add tags"></label></div>
+  ${isNew?'':`<button class="danger-link" data-a="delPrayer" data-id="${d.id}">Delete prayer</button>`}`;}};
+
+/* ================= I NEED SOMETHING ================= */
+/* Built for 2 AM: two taps from Home to the words or ritual you prepared for exactly this. */
+function needMoments(kind){const pool=kind==='prayer'?all('prayer'):kind==='ritual'?all('ritual'):[...all('ritual'),...all('prayer')];
+  const own=[...new Set(pool.flatMap(x=>x.situations||[]))].filter(s=>!MOMENTS.some(m=>lc(s).includes(lc(m))));
+  return{pool,list:[...(S.settings.moments||MOMENTS),...own]};}
+V.need={html(p){const kind=p.kind||'prayer';const {pool,list}=needMoments(kind);const m=p.m||null;
+  const res=m?pool.filter(x=>fitsMoment(x,m)).sort(byUse):[];
+  const card=x=>x.type==='prayer'?prayerRow(x):`<button class="row" data-a="go" data-to="ritual" data-p="${jp({id:x.id})}"><span class="pthumb">${imgTag(x.imageId)||ico('candle',18)}</span><span class="row-m"><span class="row-t">${esc(x.name)}</span><span class="row-s">${esc((x.situations||[]).join(' · ')||x.intention||'')}</span></span>${ico('chev',16)}</button>`;
+  const sitFor=m&&m!=='*'?(MOMENTS.some(x=>lc(x)===lc(m))?`When I feel ${lc(m)}`:m):'';
+  return `${head('I need something',{back:true})}
+  <div class="seg"><button class="${kind==='ritual'?'on':''}" data-a="needKind" data-v="ritual">A ritual</button><button class="${kind==='prayer'?'on':''}" data-a="needKind" data-v="prayer">A prayer</button></div>
+  <p class="need-q">What kind of moment is this?</p><p class="eyebrow">I feel</p>
+  <div class="chips">${list.map(x=>{const n=pool.filter(y=>fitsMoment(y,x)).length;return `<button class="chip ${m===x?'on':''} ${n?'':'faint'}" data-a="needMoment" data-v="${esc(x)}" aria-pressed="${m===x}">${esc(x)}${n?`<span class="cnt">${n}</span>`:''}</button>`;}).join('')}<button class="chip dashed ${m==='*'?'on':''}" data-a="needMoment" data-v="*">Other</button></div>
+  ${m?`<div class="mt">${res.length?`<div class="list card">${res.map(card).join('')}</div>`:`<div class="empty-need"><p class="empty">Nothing prepared for this moment yet.</p><p class="hint">You can write it now for the next time.</p>
+    <button class="btn ghost" data-a="prepareFor" data-kind="${kind}" data-v="${esc(sitFor)}">${ico('plus',16)} ${kind==='prayer'?'Write a prayer for this':'Create a ritual for this'}</button></div>`}</div>`:''}`;}};
 
 /* ================= INTENTIONS ================= */
 V.intentions={html(){const its=all('intention').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));return `${head('Intentions',{back:true,right:`<button class="ibtn" data-a="new" data-t="intention" aria-label="New intention">${ico('plus')}</button>`})}
@@ -1070,6 +1334,9 @@ const SET={
    ${s.home.find(m=>m.type==='hero'&&m.on)?`<span class="lbl">Home image & words</span><div style="max-width:220px">${slot(s.heroImageId,'settings:heroImageId','4/3')}</div><input class="field mt" id="s-hero" data-sbind="heroText" value="${esc(s.heroText||'')}" placeholder="A line for your Home">`:''}`;},
   radial(){const s=S.settings;return `<p class="hint">What appears when you tap +. Up to 8 at once. Tap a name to rename or remove it.</p>
    <div class="list card sortable" data-sort="radial">${s.radial.map(r=>`<div class="row srow" data-id="${r.id}"><span class="row-i">${ico(radialIcon(r),18)}</span><button class="row-m btn-plain" data-a="radialItem" data-id="${r.id}">${esc(r.label)}</button><button class="tog ${r.on?'on':''}" data-a="togRadial" data-id="${r.id}" role="switch" aria-checked="${r.on}" aria-label="Show ${esc(r.label)}"><i></i></button><span class="handle" aria-label="Drag to reorder">${ico('drag',18)}</span></div>`).join('')}<button class="row add" data-a="addRadial">${ico('plus',18)} Add to + menu</button></div>`;},
+  moments(){const s=S.settings;const chipsFor=k=>`<div class="chips">${s[k].map((x,i)=>`<button class="chip" data-a="delListS" data-k="${k}" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="${k}">+ Add</button></div>`;
+   return `<span class="lbl" style="margin-top:4px">Moments</span><p class="hint">Offered when you open “I need something”. Your own situations are added automatically. Tap one to remove it.</p>${chipsFor('moments')}
+   <span class="lbl">Situation suggestions</span><p class="hint">Offered when you write a ritual or prayer.</p>${chipsFor('situations')}`;},
   body(){const s=S.settings;return `<span class="lbl" style="margin-top:4px">Sensations</span><p class="hint">Words offered when you tap the body. Tap one to remove it.</p><div class="chips">${s.sensations.map((x,i)=>`<button class="chip" data-a="delListS" data-k="sensations" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="sensations">+ Add</button></div>
    <span class="lbl">Systems</span><p class="hint">Things that don’t belong to one place.</p><div class="chips">${s.systems.map((x,i)=>`<button class="chip" data-a="delListS" data-k="systems" data-i="${i}">${esc(x)}</button>`).join('')}<button class="chip dashed" data-a="addListS" data-k="systems">+ Add</button></div>`;},
   data(){const n=all('entry').length;return `<p class="hint">Everything you add stays in this browser on this device. Nothing is sent anywhere.</p>
@@ -1079,17 +1346,19 @@ const SET={
    <label class="row" for="import-file"><span class="row-i">${ico('undo',18)}</span><span class="row-m"><span class="row-t">Restore from a backup</span><span class="row-s">Replaces what is here now</span></span><input type="file" id="import-file" accept="application/json,.json" hidden></label></div>`;},
   reset(){return `<p class="hint">Erase every entry, image, thread, ritual and setting on this device and start again from the beginning. This cannot be undone.</p><button class="btn ghost" data-a="eraseAll" style="color:var(--danger)">Erase everything</button>`;},
 };
-const SET_TITLES={categories:'Categories',states:'States',palette:'My palette',theme:'Theme',corners:'Corners',home:'Home layout',radial:'+ menu',body:'Body',data:'Data',backup:'Backup',reset:'Reset'};
+const SET_TITLES={moments:'Moments & situations',categories:'Categories',states:'States',palette:'My palette',theme:'Theme',corners:'Corners',home:'Home layout',radial:'+ menu',body:'Body',data:'Data',backup:'Backup',reset:'Reset'};
 const setRow=(icon,label,act,val='',extra='')=>`<button class="row" data-a="${act}" ${extra}><span class="row-i">${icon}</span><span class="row-m">${label}</span><span class="row-v">${esc(val)}</span>${ico('chev',16)}</button>`;
 const setGo=(k,icon,val='')=>setRow(icon,SET_TITLES[k],'go',val,`data-to="set" data-p="${esc(JSON.stringify({k}))}"`);
 const goRow=(to,icon,label,val='')=>setRow(icon,label,'go',val,`data-to="${to}"`);
-V.settings={html(){const pal=S.settings.palette||[];return `${head('Settings')}
+V.settings={html(){const pal=S.settings.palette||[];return `${head('Settings',{back:true})}
   <h2 class="sec-t set-g">My world</h2><div class="list card">
    ${setGo('categories',ico('tag',18),ordered('category').length)}
    ${setGo('states',ico('state',18),ordered('state').length)}
    ${setGo('palette',`<span class="pal-mini">${pal.slice(0,4).map(p=>`<i style="--c:${p.color}"></i>`).join('')}</span>`,pal.length)}
    ${setRow(ico('threads',18),'Threads','tab',all('thread').length,'data-t="threads"')}
-   ${goRow('rituals',ico('ritual',18),'Rituals',all('ritual').length)}
+   ${setRow(ico('ritual',18),'Rituals','tab',all('ritual').length,'data-t="rituals"')}
+   ${setRow(ico('prayer',18),'Prayers','tab',all('prayer').length,'data-t="prayers"')}
+   ${setGo('moments',ico('state',18))}
    ${goRow('intentions',ico('intention',18),'Intentions',all('intention').length)}
    ${goRow('sigils',ico('pen',18),'Sigils',all('sigil').length)}
    ${setRow(ico('oracle',18),'Oracle','go','', 'data-to="oracle"')}
@@ -1117,6 +1386,7 @@ function bindSortables(){$$('.sortable').forEach(list=>{if(list._s)return;list._
     const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);row.classList.remove('dragging');reorder(list.dataset.sort,$$('.srow',list).map(r=>r.dataset.id));};
     window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);});});}
 async function reorder(kind,ids){
+  if(kind==='steps'){const d=draft();d.steps.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));render();return;}
   if(kind==='home'||kind==='radial'||kind==='palette'){const key=kind==='home'?'type':'id';const arr=S.settings[kind];arr.sort((a,b)=>ids.indexOf(a[key])-ids.indexOf(b[key]));await saveSettings();return;}
   for(let i=0;i<ids.length;i++){const x=get(ids[i]);if(x&&x.order!==i){x.order=i;await save(x);}}}
 
@@ -1127,23 +1397,30 @@ V.onboard={nav:false,html(p){
     <div class="chips" style="margin-top:10px">${[...OB_CATS,...extra].map(c=>`<button class="chip ${p.cats.includes(c)?'on':''}" data-a="obCat" data-v="${esc(c)}" aria-pressed="${p.cats.includes(c)}">${esc(c)}</button>`).join('')}<button class="chip dashed" data-a="obCustom">+ Something else</button></div>
     <div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="3">Continue</button></div></div>`;}
   if(p.step===3)return `<div class="ob"><h1>Body Oracle</h1><div class="grow"></div><h2>You’re ready.</h2><p class="ob-p">You can change everything later.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obEnter">Enter Body Oracle</button></div></div>`;
-  return `<div class="ob"><div class="grow"></div><h1 class="ob-brand">Body Oracle</h1><p class="ob-p">A private space for noticing your body, your life, and what gives it meaning.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="2">Continue</button></div></div>`;}};
+  return `<div class="ob"><div class="grow"></div><h1 class="ob-brand">Body Oracle</h1><p class="ob-p">Prepare something now for a version of yourself who will need it later.</p><p class="ob-p ob-s">Rituals for the moments that come back. Words for the states you know. A record of what happened.</p><div class="grow"></div><div class="foot"><button class="btn" data-a="obStep" data-v="2">Continue</button></div></div>`;}};
 function defaultSettings(){return{id:'settings',type:'settings',name:'Body Oracle',accent:'#f2f2f3',cards:'filled',corners:'soft',heroImageId:null,heroText:'A quieter day is still a productive day.',currentIntentionId:null,oracleImages:{},
   palette:DEFAULT_PALETTE.map(([name,color])=>({id:uid(),name,color})),
-  v:2,home:HOME_DEFAULT.map(t=>({type:t,on:HOME_ON.has(t)})),
-  radial:['body','entry:note','entry:photo','ritual','intention','state'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
+  moments:MOMENTS.slice(),situations:SITUATIONS.slice(),tonight:null,
+  v:3,home:HOME_DEFAULT.map(t=>({type:t,on:HOME_ON.has(t)})),
+  radial:['newRitual','newPrayer','entry:note','entry:photo','body','state'].map(a=>{const t=RADIAL_TYPES.find(x=>x.action===a);return{id:uid(),action:a,label:t.label,on:true};}),
   sensations:['Light','Heavy','Tense','Warm','Numb','Restless'],
   systems:['Breath','Digestion','Skin','Sleep','Energy','Nervous system','Appetite']};}
 async function seed(catNames){const now=Date.now();const items=[];let o=0;const mk=(type,x)=>{const it=Object.assign({id:uid(),type,createdAt:now+(o++),imageId:null},x);items.push(it);return it;};
   catNames.forEach((n,i)=>{const d=CAT_DEF[n];mk('category',{name:n,color:d?d[0]:PALETTE[i%PALETTE.length],icon:d?d[1]:'sign',order:i});});
   [['Calm','#9fb7a8','Settled, unhurried.'],['Restless','#d9826b','Can’t quite land anywhere.'],['Heavy','#8a8fb0','Slow, weighted.'],['Creative','#d8b56a','Ideas want out.'],['Magnetic','#c46b8f','Drawing things toward me.'],['Grounded','#a68a6d','Feet on the floor.']].forEach(([n,c,ds],i)=>mk('state',{name:n,color:c,icon:'state',description:ds,order:i}));
   [['My Body','Observations · Patterns · Care','#c98d7c','body'],['Becoming Her','Intentions · Actions · Identity','#d6b46a','sign'],['Manifestation','Desires · Rituals · Signs','#b49ccc','intention'],['Beauty','Self-care · Aesthetics · Style','#d39aa8','flower'],['My Home','Space · Comfort · Environment','#b59a7a','home']].forEach(([n,ds,c,ic])=>mk('thread',{name:n,description:ds,color:c,icon:ic,coverId:null}));
-  const R=[['The Cleansing Rite','Cleansing','Release & reset','10–15 min',['Take a warm shower.','Wash slowly, one part of the body at a time.','Imagine the day leaving the body with the water.','Put on clean clothes.','Sit quietly for five minutes.']],
-    ['Grounding','Grounding','Reconnect','5 min',['Stand or sit with both feet on the floor.','Name five things you can see.','Breathe out for longer than you breathe in, ten times.','Press your palms together and notice the warmth.']],
-    ['Protection','Protection','Energetic boundaries','3–5 min',['Stand by your door or your bed.','Say out loud what you will not carry into this space.','Draw a line in the air with your hand, or close the door slowly.','Light a candle if you like, and let it mark the boundary.']],
-    ['Night Reset','Rest','Close the day','15 min',['Dim the lights and put your phone face down.','Clear one surface in the room.','Write three lines about today.','Drink a glass of water.','Lie down and let the day be finished.']],
-    ['Beauty Ritual','Beauty','Self-love','10 min',['Wash your face with warm water.','Apply your skincare slowly, with your hands.','Look at yourself without correcting anything.','Choose one thing you like and say it.']]];
-  R.forEach(([n,g,p,du,st],i)=>mk('ritual',{name:n,group:g,purpose:p,duration:du,steps:st,sample:true,order:i,threadId:null,intentionId:null,sigilId:null}));
+  const st=a=>a.map(x=>typeof x==='string'?newStep(x):Object.assign(newStep(x[0]),x[1]));
+  const unwanted=mk('prayer',{sample:true,name:'Read this when I feel unwanted',situations:['When I feel rejected','When I feel lonely'],text:'I am still here.\n\nWhat leaves me does not determine my value.\n\nI do not need to chase what has already withdrawn.\n\nLet me return to myself.',tags:'',color:null,colorId:null,favourite:false,lastReadAt:null});
+  const prod=(name,notes,price='')=>Object.assign(newProduct(),{name,notes,price});
+  const reset={name:'Reset After a Difficult Day',group:'Returning',duration:'40 min',situations:['After a difficult day','When I feel disconnected'],intention:'I want to return to myself after spending too much energy on other people.',
+    objects:[{id:uid(),name:'Journal',have:false},{id:uid(),name:'Black dress',have:false},{id:uid(),name:'Playlist',have:false}],products:[prod('Lavender candle','The smell that tells me the day is over.'),prod('Rose perfume','Wear this during the ritual because I associate it with becoming softer.')],prayerIds:[unwanted.id]};
+  reset.steps=st([['Take a shower.',{duration:'10 min',note:'Let the day go with the water.'}],['Put on the perfume.',{productId:reset.products[1].id}],['Light the candle.',{productId:reset.products[0].id,check:true}],['Put your phone away.',{check:true}],['Sit somewhere quiet.',{duration:'3 min'}],['Read the prayer.',{prayerId:unwanted.id}],['Write what you are leaving behind.',{note:'One page. You do not need to reread it.'}]]);
+  const R=[[reset.name,reset],
+    ['Grounding',{group:'Grounding',duration:'5 min',situations:['When I feel disconnected','When I am overwhelmed'],intention:'Come back into the body and the room.',steps:st(['Stand or sit with both feet on the floor.','Name five things you can see.',['Breathe out for longer than you breathe in, ten times.',{duration:'2 min'}],'Press your palms together and notice the warmth.'])}],
+    ['Protection',{group:'Protection',duration:'5 min',situations:['Before seeing someone','When I move into a new place'],intention:'Mark what I will and will not carry into this space.',objects:[{id:uid(),name:'Candle',have:false}],steps:st(['Stand by your door or your bed.','Say out loud what you will not carry into this space.','Draw a line in the air with your hand, or close the door slowly.','Light a candle if you like, and let it mark the boundary.'])}],
+    ['Night Reset',{group:'Sleep',duration:'15 min',situations:['Before sleep','When I cannot sleep'],intention:'Let the day be finished.',steps:st([['Dim the lights and put your phone face down.',{check:true}],'Clear one surface in the room.','Write three lines about today.','Drink a glass of water.','Lie down and let the day be finished.'])}],
+    ['Beauty Ritual',{group:'Beauty',duration:'10 min',situations:['Before going out','When I feel ugly'],intention:'Look at myself without correcting anything.',steps:st(['Wash your face with warm water.','Apply your skincare slowly, with your hands.','Look at yourself without correcting anything.','Choose one thing you like and say it.'])}]];
+  R.forEach(([n,x],i)=>{const r=mk('ritual',Object.assign({name:n,sample:true,order:i,threadId:null,intentionId:null,sigilId:null},x));normRitual(r);r.purpose=r.intention;});
   const I=[['More freedom','I want more freedom.','I am building a life where I can move freely.'],['More presence','I want to be here, not somewhere in my head.','I return to my body and to the room I am in.'],['More confidence','I want to trust myself more.','I act before I feel completely ready.']];
   const ints=I.map(([t,de,st])=>mk('intention',{sample:true,title:t,desire:de,statement:st,actions:[],signsToNotice:[],reflection:'',threadId:null,ritualId:null,sigilId:null}));
   S.settings.currentIntentionId=ints[0].id;
@@ -1164,7 +1441,8 @@ const NEW={
   thread:()=>go('threadEdit',{draft:{id:uid(),type:'thread',name:'',description:'',color:PALETTE[all('thread').length%PALETTE.length],icon:'threads',coverId:null}}),
   category:()=>go('metaEdit',{draft:{id:uid(),type:'category',name:'',color:PALETTE[all('category').length%PALETTE.length],icon:'sign',imageId:null,order:all('category').length}}),
   state:()=>go('metaEdit',{draft:{id:uid(),type:'state',name:'',description:'',color:PALETTE[(all('state').length+3)%PALETTE.length],icon:'state',imageId:null,order:all('state').length}}),
-  ritual:()=>go('ritualEdit',{draft:{id:uid(),type:'ritual',name:'',purpose:'',duration:'',group:'',steps:[''],imageId:null,threadId:null,intentionId:null,sigilId:null,sample:false}}),
+  ritual:(extra={})=>{const d=Object.assign({id:uid(),type:'ritual',name:'',purpose:'',duration:'',group:'',steps:[newStep(),newStep(),newStep()],imageId:null,threadId:null,intentionId:null,sigilId:null,sample:false},extra);normRitual(d);go('ritualEdit',{draft:d});},
+  prayer:(extra={},returnTo)=>{const d=Object.assign({id:uid(),type:'prayer',name:'',text:'',imageId:null,_rituals:[]},extra);normPrayer(d);go('prayerEdit',{draft:d,returnTo});},
   intention:()=>go('intentionEdit',{draft:{id:uid(),type:'intention',title:'',desire:'',statement:'',actions:[],signsToNotice:[],reflection:'',imageId:null,sigilId:null,ritualId:null,threadId:null}}),
   sigil:(extra={})=>{SG.buf=null;SG.hist=[];go('sigil',{draft:Object.assign({id:uid(),type:'sigil',name:'',imageId:null,intentionId:null,ritualId:null,threadId:null},extra)});},
 };
@@ -1177,7 +1455,8 @@ const A={
   radial:()=>openRadial(),
   closeRadial:()=>closeRadial(),
   radialPick:t=>{const r=S.settings.radial.find(x=>x.id===t.dataset.id);closeRadial();if(!r)return;const a=r.action;
-    if(a==='body')newBody();else if(a==='intention')NEW.intention();else if(a==='state')stateLogSheet();else if(a==='sigil')NEW.sigil();
+    if(a==='newRitual')NEW.ritual();else if(a==='newPrayer')NEW.prayer();
+    else if(a==='body')newBody();else if(a==='intention')NEW.intention();else if(a==='state')stateLogSheet();else if(a==='sigil')NEW.sigil();
     else if(a==='ritual')openEntry('ritual');else if(a==='sign')openEntry('sign',{intentionId:S.settings.currentIntentionId||null});
     else if(a==='entry:photo')openEntry('photo',{},true);else if(a.startsWith('entry:'))openEntry(a.slice(6));
     else if(a.startsWith('cat:'))openEntry('note',{categoryIds:[a.slice(4)]});},
@@ -1187,7 +1466,8 @@ const A={
   editHero:()=>inputSheet('Words for your Home',S.settings.heroText,async v=>{S.settings.heroText=v;await saveSettings();render();},{ph:'My body is asking for a quieter day.',multiline:true}),
   logState:async t=>{const id=t.dataset.id;const k=dkey(Date.now());const ex=all('entry').find(e=>e.kind==='state'&&dkey(e.date)===k&&(e.stateIds||[]).includes(id)&&!(e.text||'').trim());
     if(ex){if(ex.stateIds.length>1){ex.stateIds=ex.stateIds.filter(s=>s!==id);await save(ex);}else await removeItem(ex.id);}else await save(newEntryDraft('state',{stateIds:[id]}));render();},
-  mapFilter:t=>{MS.filter=t.dataset.f;if(R.tab!=='map'||R.stack.length)tab('map');else render();},
+  mapFilter:t=>{MS.filter=t.dataset.f;if(MS.mode!=='calendar')MS.mode='timeline';tab('map');},
+  archView:t=>{AS.view=t.dataset.v;render();},
   mapMode:t=>{MS.mode=t.dataset.m;render();},
   calMonth:t=>{const b=MS.ym?new Date(MS.ym+'-01T12:00:00'):new Date();b.setDate(1);b.setMonth(b.getMonth()+ +t.dataset.d);MS.ym=`${b.getFullYear()}-${pad(b.getMonth()+1)}`;render();},
   calDay:t=>{MS.sel=t.dataset.k;const d=new Date(t.dataset.k+'T12:00:00');MS.ym=`${d.getFullYear()}-${pad(d.getMonth()+1)}`;render();},
@@ -1227,7 +1507,7 @@ const A={
   threadSort:t=>{TS.sort=t.dataset.v;render();},
   editThread:t=>go('threadEdit',{draft:clone(get(t.dataset.id))}),
   saveThread:async()=>{const d=draft();if(!(d.name||'').trim()){toast('Give the thread a title.');return;}d.name=d.name.trim();finalizeDraft(d);await save(d);R.stack.pop();render();toast('Saved');},
-  delThread:t=>{const id=t.dataset.id;confirmSheet('Delete this thread? Its entries stay in your archive.','Delete thread',async()=>{const th=get(id);dropImage(th&&th.coverId);for(const e of all('entry'))if((e.threadIds||[]).includes(id)){e.threadIds=e.threadIds.filter(x=>x!==id);await save(e);}for(const x of[...all('ritual'),...all('intention'),...all('sigil')])if(x.threadId===id){x.threadId=null;await save(x);}await removeItem(id);R.stack=[];R.tab='threads';render();toast('Thread deleted');});},
+  delThread:t=>{const id=t.dataset.id;confirmSheet('Delete this thread? Its entries stay in your archive.','Delete thread',async()=>{const th=get(id);dropImage(th&&th.coverId);for(const e of all('entry'))if((e.threadIds||[]).includes(id)){e.threadIds=e.threadIds.filter(x=>x!==id);await save(e);}for(const x of[...all('ritual'),...all('intention'),...all('sigil')])if(x.threadId===id){x.threadId=null;await save(x);}await removeItem(id);tab('threads');toast('Thread deleted');});},
   newInThread:t=>{const id=t.dataset.id;sheet([{label:'Entry',fn:()=>openEntry('note',{threadIds:[id]})},{label:'Photo',fn:()=>openEntry('photo',{threadIds:[id]},true)},{label:'Body observation',fn:()=>newBody({threadIds:[id]})}],'Add to this thread');},
   threadPhoto:t=>{const {t:tid,e:eid,p}=t.dataset;sheet([{label:'Open entry',fn:()=>go('entry',{id:eid})},{label:'Set as thread cover',fn:async()=>{const th=get(tid);const nid=await copyImage(p);if(!nid)return;const old=th.coverId;th.coverId=nid;await save(th);dropImage(old);render();toast('Cover updated');}}]);},
   archFilter:t=>{AS.filter=t.dataset.f;render();},
@@ -1242,12 +1522,57 @@ const A={
   addRadial:()=>{const have=new Set(S.settings.radial.map(r=>r.action));const opts=[...RADIAL_TYPES.map(x=>({id:x.action,label:x.label})),...ordered('category').map(c=>({id:'cat:'+c.id,label:c.name,color:c.color}))].filter(o=>!have.has(o.id));
     pickSheet('Add to + menu',opts,[],false,async ids=>{const o=opts.find(x=>x.id===ids[0]);if(!o)return;const on=S.settings.radial.filter(x=>x.on).length<8;S.settings.radial.push({id:uid(),action:o.id,label:o.label,on});await saveSettings();render();if(!on)toast('Added. Switch another off to show it.');});},
   delListS:t=>{const k=t.dataset.k,i=+t.dataset.i;const v=S.settings[k][i];sheet([{label:`Remove “${v}”`,danger:true,fn:async()=>{S.settings[k].splice(i,1);await saveSettings();render();}}]);},
-  addListS:t=>{const k=t.dataset.k;inputSheet(k==='sensations'?'New sensation':'New system','',async v=>{if(!S.settings[k].includes(v))S.settings[k].push(v);await saveSettings();render();},{btn:'Add'});},
+  addListS:t=>{const k=t.dataset.k;inputSheet({sensations:'New sensation',systems:'New system',moments:'New moment',situations:'New situation'}[k]||'Add','',async v=>{if(!S.settings[k].includes(v))S.settings[k].push(v);await saveSettings();render();},{btn:'Add'});},
   ritFilter:t=>{RS.f=t.dataset.f;render();},
-  ritualDone:async t=>{const r=get(t.dataset.id);const e=newEntryDraft('ritual',{ritualId:r.id,threadIds:r.threadId?[r.threadId]:[],intentionId:r.intentionId||null});const rc=ordered('category').find(c=>c.name.toLowerCase()==='ritual');if(rc)e.categoryIds=[rc.id];await save(e);render();toast('Added to today');},
-  editRitual:t=>go('ritualEdit',{draft:clone(get(t.dataset.id))}),
-  saveRitual:async()=>{const d=draft();if(!(d.name||'').trim()){toast('Give the ritual a name.');return;}d.name=d.name.trim();d.steps=(d.steps||[]).filter(s=>s.trim());finalizeDraft(d);await save(d);R.stack.pop();render();toast('Saved');},
-  delRitual:t=>{const id=t.dataset.id;confirmSheet('Delete this ritual? Times you did it stay in your archive.','Delete ritual',async()=>{dropImage(get(id).imageId);for(const x of[...all('intention'),...all('sigil')])if(x.ritualId===id){x.ritualId=null;await save(x);}await removeItem(id);R.stack.splice(-2);render();});},
+  prayFilter:t=>{PS.f=t.dataset.f;render();},
+  ritualDone:async t=>{const r=get(t.dataset.id);const e=newEntryDraft('ritual',{ritualId:r.id,threadIds:r.threadIds||[],intentionId:r.intentionId||null,color:r.color||null,colorId:r.colorId||null});const rc=ordered('category').find(c=>c.name.toLowerCase()==='ritual');if(rc)e.categoryIds=[rc.id];await save(e);r.lastPerformedAt=Date.now();await save(r);render();toast('Added to today');},
+  editRitual:t=>{const d=clone(get(t.dataset.id));normRitual(d);go('ritualEdit',{draft:d});},
+  saveRitual:async()=>{const d=draft();if(!(d.name||'').trim()){toast('Give the ritual a name.');return;}d.name=d.name.trim();
+    d.steps=(d.steps||[]).filter(s=>s.text.trim()||s.imageId||s.note||s.prayerId||s.productId);d.objects=(d.objects||[]).filter(o=>o.name.trim());d.products=(d.products||[]).filter(p=>p.name||p.imageId||p.url);
+    const isNew=!S.items.has(d.id);d.purpose=d.intention||d.purpose||'';d.threadId=(d.threadIds||[])[0]||null;delete d.sample;finalizeDraft(d);await save(d);R.stack.pop();
+    if(isNew)R.stack.push({name:'ritual',params:{id:d.id}});render();toast('Saved');},
+  delRitual:t=>{const id=t.dataset.id;confirmSheet('Delete this ritual? Times you did it stay in your archive.','Delete ritual',async()=>{const r=get(id);dropImage(r.imageId);(r.visualIds||[]).forEach(dropImage);(r.steps||[]).forEach(s=>dropImage(s.imageId));(r.products||[]).forEach(p=>dropImage(p.imageId));
+    for(const x of[...all('intention'),...all('sigil')])if(x.ritualId===id){x.ritualId=null;await save(x);}if(isTonight('ritual',id)){S.settings.tonight=null;await saveSettings();}await removeItem(id);R.stack.splice(-2);render();});},
+  togSit:t=>{const d=draft(),v=t.dataset.v;const a=d.situations=d.situations||[];const i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);render();},
+  sitAll:()=>{draft()._sitAll=true;render();},
+  newSit:()=>inputSheet('When is this for?','',v=>{const d=draft();(d.situations=d.situations||[]).includes(v)||d.situations.push(v);render();},{ph:'e.g. When I feel ugly',btn:'Add'}),
+  addObject:()=>inputSheet('Something to have ready','',v=>{draft().objects.push({id:uid(),name:v,have:false});render();},{ph:'e.g. Candle, journal, a black dress',btn:'Add'}),
+  editObject:t=>{const d=draft(),i=+t.dataset.i,o=d.objects[i];sheet([{label:'Rename',fn:()=>inputSheet('Rename',o.name,v=>{o.name=v;render();})},{label:'Remove',danger:true,fn:()=>{d.objects.splice(i,1);render();}}],o.name);},
+  addProduct:()=>{const d=draft();d.products.push(newProduct());go('productEdit',{draft:d,i:d.products.length-1});},
+  editProduct:t=>go('productEdit',{draft:draft(),i:+t.dataset.i}),
+  doneProduct:t=>{const d=draft(),i=+t.dataset.i,p=d.products[i];if(p&&!p.name&&!p.imageId&&!p.url&&!p.notes)d.products.splice(i,1);back();},
+  delProduct:t=>{const d=draft(),i=+t.dataset.i,p=d.products[i];if(p.imageId)(d._drop=d._drop||[]).push(p.imageId);d.steps.forEach(s=>{if(s.productId===p.id)s.productId=null;});d.products.splice(i,1);back();},
+  addStep:()=>{const d=draft();d.steps.push(newStep());render();const ins=$$('.stp-t');const last=ins[ins.length-1];if(last)last.focus();},
+  editStep:t=>go('stepEdit',{draft:draft(),i:+t.dataset.i}),
+  delStep:t=>{const d=draft(),i=+t.dataset.i;const s=d.steps[i];if(s&&s.imageId)(d._drop=d._drop||[]).push(s.imageId);d.steps.splice(i,1);back();},
+  togStepCheck:t=>{const s=draft().steps[+t.dataset.i];s.check=!s.check;render();},
+  pickStepProduct:t=>{const d=draft(),s=d.steps[+t.dataset.i];pickSheet('Product for this step',d.products.map(p=>({id:p.id,label:p.name||'Untitled product'})),[s.productId],false,ids=>{s.productId=ids[0]||null;render();},{label:'Add a product',fn:()=>{const p=newProduct();d.products.push(p);s.productId=p.id;go('productEdit',{draft:d,i:d.products.length-1});}});},
+  pickStepPrayer:t=>{const i=+t.dataset.i,d=draft(),s=d.steps[i];pickSheet('Prayer for this step',all('prayer').sort(byUse).map(p=>({id:p.id,label:p.name,color:p.color})),[s.prayerId],false,ids=>{s.prayerId=ids[0]||null;render();},{label:'Write a new prayer',fn:()=>NEW.prayer({},`steps.${i}.prayerId`)});},
+  attachPrayer:()=>{const d=draft();pickSheet('Attach prayers',all('prayer').sort(byUse).map(p=>({id:p.id,label:p.name,color:p.color})),d.prayerIds,true,ids=>{d.prayerIds=ids;render();},{label:'Write a new prayer',fn:()=>NEW.prayer({},'prayerIds')});},
+  unlinkPrayer:t=>{const d=draft();d.prayerIds=d.prayerIds.filter(x=>x!==t.dataset.id);render();},
+  togFav:async t=>{const x=get(t.dataset.id);x.favourite=!x.favourite;await save(x);render();},
+  keepTonight:async t=>{const {kind,id}=t.dataset;S.settings.tonight=isTonight(kind,id)?null:{kind,id};await saveSettings();render();toast(S.settings.tonight?'Kept for tonight':'Removed from tonight');},
+  togHave:async t=>{const r=get(t.dataset.id);const x=r[t.dataset.k][+t.dataset.i];x.have=!x.have;await save(r);render();},
+  runGo:async t=>{const p=cur().params;stopTimer();p.i=Math.max(-1,p.i+ +t.dataset.d);const r=get(p.id);const n=(r.steps||[]).filter(s=>s.text.trim()||s.imageId).length;if(p.i>=n){r.lastPerformedAt=Date.now();await save(r);}render();},
+  runTimer:t=>{if(RUN.end){stopTimer();render();return;}RUN.end=Date.now()+ +t.dataset.m*6e4;RUN.timer=setInterval(tick,500);tick();},
+  runExit:()=>{const p=cur().params;const r=get(p.id);const n=(r.steps||[]).filter(s=>s.text.trim()||s.imageId).length;if(p.i>=0&&p.i<n)confirmSheet('Leave this ritual?','Leave',()=>{stopTimer();back();});else{stopTimer();back();}},
+  runSave:async()=>{const p=cur().params,r=get(p.id);const note=($('#run-note')||{}).value||'';const e=newEntryDraft('ritual',{ritualId:r.id,text:note.trim(),threadIds:r.threadIds||[],intentionId:r.intentionId||null,color:r.color||null,colorId:r.colorId||null});
+    const rc=ordered('category').find(c=>c.name.toLowerCase()==='ritual');if(rc)e.categoryIds=[rc.id];await save(e);back();toast('Saved to your archive');},
+  runClose:()=>back(),
+  editPrayer:t=>{const d=clone(get(t.dataset.id));normPrayer(d);d._rituals=all('ritual').filter(r=>(r.prayerIds||[]).includes(d.id)).map(r=>r.id);go('prayerEdit',{draft:d});},
+  prayerRituals:()=>{const d=draft();pickSheet('Part of rituals',all('ritual').sort(byUse).map(r=>({id:r.id,label:r.name,color:r.color})),d._rituals||[],true,ids=>{d._rituals=ids;render();});},
+  savePrayer:async()=>{const p=cur().params,d=p.draft;const text=(d.text||'').trim();if(!(d.name||'').trim()&&!text){toast('Write the prayer first.');return;}
+    const isNew=!S.items.has(d.id);d.name=(d.name||'').trim()||text.split('\n')[0].slice(0,60);const want=d._rituals?new Set(d._rituals):null;delete d.sample;finalizeDraft(d);await save(d);
+    if(want)for(const r of all('ritual')){const has=(r.prayerIds||[]).includes(d.id);if(has!==want.has(r.id)){r.prayerIds=has?r.prayerIds.filter(x=>x!==d.id):[...(r.prayerIds||[]),d.id];await save(r);}}
+    const ret=p.returnTo;R.stack.pop();if(ret){const pd=cur().params.draft;if(pd){if(ret==='prayerIds'){pd.prayerIds=pd.prayerIds||[];pd.prayerIds.includes(d.id)||pd.prayerIds.push(d.id);}else setPath(pd,ret,d.id);}}
+    else if(isNew)R.stack.push({name:'prayer',params:{id:d.id}});render();toast('Saved');},
+  delPrayer:t=>{const id=t.dataset.id;confirmSheet('Delete this prayer? Rituals keep their other steps.','Delete prayer',async()=>{const x=get(id);dropImage(x.imageId);
+    for(const r of all('ritual')){let ch=false;if((r.prayerIds||[]).includes(id)){r.prayerIds=r.prayerIds.filter(y=>y!==id);ch=true;}(r.steps||[]).forEach(s=>{if(s.prayerId===id){s.prayerId=null;ch=true;}});if(ch)await save(r);}
+    if(isTonight('prayer',id)){S.settings.tonight=null;await saveSettings();}await removeItem(id);R.stack.splice(-2);render();});},
+  needKind:t=>{const p=cur().params;p.kind=t.dataset.v;p.m=null;render();},
+  needMoment:t=>{const p=cur().params;p.m=p.m===t.dataset.v?null:t.dataset.v;render();},
+  prepareFor:t=>{const v=t.dataset.v;const sit=v?{situations:[v]}:{};t.dataset.kind==='prayer'?NEW.prayer(sit):NEW.ritual(sit);},
+  recordSheet:()=>sheet([{label:'A note',fn:()=>openEntry('note')},{label:'A photo',fn:()=>openEntry('photo',{},true)},{label:'Something in my body',fn:()=>newBody()},{label:'How I feel',fn:()=>stateLogSheet()}],'Record something'),
   addListItem:t=>{const d=draft(),f=t.dataset.f;d[f]=d[f]||[];d[f].push(t.dataset.obj?{text:'',done:false}:'');render();const ins=$$(`[data-bind^="${f}."]`);const last=ins[ins.length-1];if(last)last.focus();},
   delListItem:t=>{const d=draft();d[t.dataset.f].splice(+t.dataset.i,1);render();},
   editIntention:t=>go('intentionEdit',{draft:clone(get(t.dataset.id))}),
@@ -1287,15 +1612,16 @@ async function importData(f){if(!f)return;let data;try{data=JSON.parse(await f.t
   confirmSheet(`Restore ${plural(data.items.filter(x=>x.type==='entry').length,'entry','entries')} from this backup? What is here now will be replaced.`,'Restore backup',async()=>{
     await DB.clear();IMG.forEach(u=>URL.revokeObjectURL(u));IMG.clear();S.items.clear();
     for(const x of data.items){S.items.set(x.id,x);await DB.put(x);}S.settings=Object.assign(defaultSettings(),{v:1},data.settings||{});migrateSettings(S.settings);await saveSettings();
-    for(const [k,u] of Object.entries(data.blobs||{}))await putBlob(k,dataURLToBlob(u));applyTheme();R.stack=[];R.tab='home';render();toast('Backup restored');});}
+    for(const [k,u] of Object.entries(data.blobs||{}))await putBlob(k,dataURLToBlob(u));await normalizeItems();applyTheme();R.stack=[];R.tab='home';render();toast('Backup restored');});}
 
 /* ================= theme & boot ================= */
-/* v2 redesign: Home and + menu start from the simpler layout; entries, images and lists are untouched. */
+/* v3: Home and + menu move to the ritual-library layout; entries, images and lists are untouched. */
+async function normalizeItems(){for(const x of S.items.values()){if((x.type==='ritual'&&normRitual(x))||(x.type==='prayer'&&normPrayer(x)))await save(x);}}
 function migrateSettings(s){const d=defaultSettings();const ver=s.v||1;for(const k in d)if(s[k]===undefined)s[k]=d[k];
-  if(ver<2){s.home=d.home;s.radial=d.radial;s.v=2;saveSettings();}
+  if(ver<3){s.home=d.home;s.radial=d.radial;s.v=3;saveSettings();}
   const have=new Set(s.home.map(m=>m.type));HOME_DEFAULT.forEach(t=>{if(!have.has(t))s.home.push({type:t,on:false});});}
 function applyTheme(){const s=S.settings,r=document.documentElement;r.style.setProperty('--accent',s.accent);r.style.setProperty('--accent-ink',lum(s.accent)>.42?'#0b0b0c':'#fbfbfb');r.dataset.cards=s.cards;r.dataset.corners=s.corners;}
-function buildNav(){$('#nav').innerHTML=[['home','Home','home'],['map','Map','map'],null,['threads','Threads','threads'],['archive','Archive','archive'],['settings','Settings','settings']].map(x=>x?`<button class="nb" data-a="tab" data-t="${x[0]}">${ico(x[2],22)}<span>${x[1]}</span></button>`:`<button class="nb plus" data-a="radial" aria-label="Add"><span class="pc">${ico('plus',26)}</span></button>`).join('');}
+function buildNav(){$('#nav').innerHTML=[['home','Home','home'],['rituals','Rituals','ritual'],null,['prayers','Prayers','prayer'],['archive','Archive','archive']].map(x=>x?`<button class="nb" data-a="tab" data-t="${x[0]}">${ico(x[2],22)}<span>${x[1]}</span></button>`:`<button class="nb plus" data-a="radial" aria-label="Add"><span class="pc">${ico('plus',26)}</span></button>`).join('');}
 async function init(){
   buildNav();fileIn=document.createElement('input');fileIn.type='file';fileIn.accept='image/*';fileIn.hidden=true;fileIn.addEventListener('change',onFile);document.body.append(fileIn);
   document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const f=A[t.dataset.a];if(f){e.preventDefault();f(t,e);}});
@@ -1311,7 +1637,7 @@ async function init(){
   S.settings=S.items.get('settings')||null;S.items.delete('settings');await loadImages();
   if(!S.settings){S.settings=defaultSettings();R.stack=[{name:'onboard',params:{step:1,cats:[]}}];}
   else migrateSettings(S.settings);
-  applyTheme();render();
+  await normalizeItems();applyTheme();render();
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
   if(window.BO_PWA&&'serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 }

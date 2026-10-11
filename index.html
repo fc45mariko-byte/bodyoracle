@@ -459,6 +459,18 @@ img{max-width:100%}
 .empty-need .btn{width:auto;padding:0 20px}
 .ob-s{font-size:14px;margin-top:14px}
 
+
+/* video */
+.vbadge{position:absolute;left:8px;bottom:8px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;pointer-events:none}
+.vbadge svg{fill:currentColor;margin-left:1px}
+.slot .vbadge{left:10px;bottom:10px;width:30px;height:30px}
+.vid{display:block;width:100%;background:#000;border-radius:var(--r-img);object-fit:contain}
+.vid.r45{aspect-ratio:4/5}.vid.r43{aspect-ratio:4/3}.vid.r11{aspect-ratio:1}
+.run-img .vid{max-height:40vh}
+.vplay{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center}
+.vplay video{width:100%;max-height:100%}
+.vclose{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);right:8px;z-index:1;color:#fff;background:rgba(0,0,0,.4)}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 </style>
@@ -568,7 +580,7 @@ const SUGGESTED_CATS=['Body','Mind','Ritual','Beauty','Manifestation','Dreams','
 const KINDS={
   note:{label:'Note',icon:'note',prompt:"What's happening?",color:'#b9b0a4'},
   mind:{label:'Mind',icon:'mind',prompt:"What's on your mind?",color:'#9b97c2'},
-  photo:{label:'Photo',icon:'photo',prompt:'What is this moment?',color:'#b9b0a4'},
+  photo:{label:'Photo or video',icon:'photo',prompt:'What is this moment?',color:'#b9b0a4'},
   body:{label:'Body',icon:'body',color:'#c98d7c'},
   ritual:{label:'Ritual',icon:'ritual',prompt:'How did it feel?',color:'#c7a36a'},
   intention:{label:'Intention',icon:'intention',color:'#e0cfa6'},
@@ -610,10 +622,27 @@ let ssTimer;function saveSettingsSoon(){clearTimeout(ssTimer);ssTimer=setTimeout
 
 /* ================= images ================= */
 const IMG=new Map();
-async function loadImages(){try{for(const [k,b] of await DB.allBlobs()){if(!String(k).endsWith('~o')&&b)IMG.set(k,URL.createObjectURL(b));}}catch(e){}}
-async function putBlob(k,b){await DB.putBlob(k,b);if(!k.endsWith('~o')){const old=IMG.get(k);if(old)URL.revokeObjectURL(old);IMG.set(k,URL.createObjectURL(b));}}
-function dropImage(id){if(!id)return;const u=IMG.get(id);if(u)URL.revokeObjectURL(u);IMG.delete(id);DB.delBlob(id).catch(()=>{});DB.delBlob(id+'~o').catch(()=>{});}
-async function copyImage(id){const nid=uid();const b=await DB.getBlob(id);if(!b)return null;const o=await DB.getBlob(id+'~o');if(o)await putBlob(nid+'~o',o);await putBlob(nid,b);return nid;}
+/* A video is stored as two blobs: its poster frame under the media id (so every image surface shows it) and the video under id~v. */
+const VID=new Map();
+function cacheBlob(k,b){k=String(k);if(k.endsWith('~o'))return;const isV=k.endsWith('~v');const m=isV?VID:IMG;const key=isV?k.slice(0,-2):k;const old=m.get(key);if(old)URL.revokeObjectURL(old);m.set(key,URL.createObjectURL(b));}
+async function loadImages(){try{for(const [k,b] of await DB.allBlobs())if(b)cacheBlob(k,b);}catch(e){}}
+async function putBlob(k,b){await DB.putBlob(k,b);cacheBlob(k,b);}
+function dropImage(id){if(!id)return;for(const m of[IMG,VID]){const u=m.get(id);if(u)URL.revokeObjectURL(u);m.delete(id);}for(const k of[id,id+'~o',id+'~v'])DB.delBlob(k).catch(()=>{});}
+async function copyImage(id){const nid=uid();const b=await DB.getBlob(id);if(!b)return null;for(const x of['~o','~v']){const o=await DB.getBlob(id+x);if(o)await putBlob(nid+x,o);}await putBlob(nid,b);return nid;}
+const isVid=id=>!!id&&VID.has(id);
+const vbadge=id=>isVid(id)?`<i class="vbadge" aria-label="Video">${ico('play',12)}</i>`:'';
+/* where a person would watch it: a real player; elsewhere the poster with a play badge */
+const media=(id,cls='')=>isVid(id)?`<video class="vid ${cls}" src="${VID.get(id)}" poster="${IMG.get(id)||''}" controls playsinline preload="metadata"></video>`:imgTag(id);
+const MAX_VIDEO=250*1024*1024;
+function videoPoster(file){return new Promise(res=>{const url=URL.createObjectURL(file);const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';let done=false;
+  const finish=b=>{if(done)return;done=true;URL.revokeObjectURL(url);res(b);};
+  const fallback=()=>{const c=document.createElement('canvas');c.width=960;c.height=720;const g=c.getContext('2d');g.fillStyle='#1f1f22';g.fillRect(0,0,960,720);g.fillStyle='rgba(255,255,255,.6)';g.beginPath();g.moveTo(440,300);g.lineTo(440,420);g.lineTo(540,360);g.closePath();g.fill();c.toBlob(b=>finish(b),'image/jpeg',.85);};
+  const t=setTimeout(fallback,8000);
+  v.onloadeddata=()=>{try{v.currentTime=Math.min(1,(v.duration||2)/3);}catch(e){clearTimeout(t);fallback();}};
+  v.onseeked=()=>{clearTimeout(t);try{const max=1400,sc=Math.min(1,max/Math.max(v.videoWidth,v.videoHeight));const c=document.createElement('canvas');c.width=Math.round(v.videoWidth*sc)||960;c.height=Math.round(v.videoHeight*sc)||720;c.getContext('2d').drawImage(v,0,0,c.width,c.height);c.toBlob(b=>b?finish(b):fallback(),'image/jpeg',.85);}catch(e){fallback();}};
+  v.onerror=()=>{clearTimeout(t);fallback();};v.src=url;});}
+function playVideo(id){const m=$('#modal');if(!isVid(id))return;m.hidden=false;m.innerHTML=`<div class="vplay"><button class="ibtn vclose" data-c="x" aria-label="Close video">${ico('close',22)}</button><video src="${VID.get(id)}" poster="${IMG.get(id)||''}" controls autoplay playsinline></video></div>`;
+  m.onclick=e=>{if(e.target.closest('[data-c="x"]')){m.hidden=true;m.innerHTML='';m.onclick=null;}};}
 const imgTag=id=>{const u=id&&IMG.get(id);return u?`<img src="${u}" alt="" loading="lazy">`:''};
 function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
 async function toOrig(file){const url=URL.createObjectURL(file);try{const img=await loadImg(url);const max=2000;const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return await new Promise((r,j)=>c.toBlob(b=>b?r(b):j(new Error('encode')),'image/jpeg',.88));}finally{URL.revokeObjectURL(url);}}
@@ -621,6 +650,9 @@ async function toOrig(file){const url=URL.createObjectURL(file);try{const img=aw
 let fileIn,pickCb=null;
 function pickImage(ratio,cb){pickCb={ratio,cb};fileIn.value='';fileIn.click();}
 async function onFile(){const f=fileIn.files&&fileIn.files[0];if(!f||!pickCb)return;const {ratio,cb}=pickCb;pickCb=null;
+  if((f.type||'').startsWith('video/')||/\.(mov|mp4|m4v|webm|3gp)$/i.test(f.name||'')){
+    if(f.size>MAX_VIDEO){toast('That video is over 250 MB. Try a shorter clip.');return;}
+    toast('Adding video…');try{const poster=await videoPoster(f);const id=uid();await putBlob(id+'~v',f);await putBlob(id,poster);await cb(id);}catch(e){toast('This video could not be saved. Storage may be full.');}return;}
   try{const orig=await toOrig(f);openCropper(orig,ratio,async crop=>{const id=uid();await putBlob(id+'~o',orig);await putBlob(id,crop);await cb(id);});}
   catch(e){toast('This image could not be opened. Try a JPEG or PNG.');}}
 async function recrop(id,ratio){const b=(await DB.getBlob(id+'~o'))||(await DB.getBlob(id));if(!b)return;openCropper(b,ratio,async crop=>{await putBlob(id,crop);render();});}
@@ -651,7 +683,7 @@ function openCropper(blob,ratioStr,done){
 }
 
 /* image slot: any image container in the app */
-function slot(id,ref,ratio='1/1',cls=''){const u=id&&IMG.get(id);return `<button type="button" class="slot ${u?'has':''} ${cls}" style="aspect-ratio:${ratio}" data-a="slot" data-ref="${ref}" data-ratio="${ratio}" aria-label="${u?'Change image':'Add image'}">${u?`<img src="${u}" alt="">`:`<span class="slot-plus"><i>${ico('plus',20)}</i></span>`}</button>`;}
+function slot(id,ref,ratio='1/1',cls=''){const u=id&&IMG.get(id);return `<button type="button" class="slot ${u?'has':''} ${cls}" style="aspect-ratio:${ratio}" data-a="slot" data-ref="${ref}" data-ratio="${ratio}" aria-label="${u?(isVid(id)?'Change video':'Change image'):'Add image or video'}">${u?`<img src="${u}" alt="">${vbadge(id)}`:`<span class="slot-plus"><i>${ico('plus',20)}</i></span>`}</button>`;}
 const getPath=(o,p)=>p.split('.').reduce((t,k)=>t==null?t:t[k],o);
 function parseRef(s){
   const p=s.split(':');let target,persist,isDraft=false,rest;
@@ -744,8 +776,8 @@ function entryColor(e){if(e.color)return e.color;const s=(e.stateIds||[]).map(ge
 const kindTag=e=>e.kind==='note'||e.kind==='photo'?'':(KINDS[e.kind]||{}).label||'';
 /* entry colour appears only as a small accent: a dot on images, a faint tint behind text */
 const tdot=c=>`<i class="tdot" style="--c:${c}"></i>`;
-function tile(e,cap){const ph=(e.photoIds||[]).map(id=>IMG.get(id)).find(Boolean);const k=KINDS[e.kind]||KINDS.note;const c=entryColor(e);
-  return `<div class="tw"><button class="tile ${ph?'':'txt'}" style="--c:${c}" data-a="go" data-to="entry" data-p="${jp({id:e.id})}">${ph?`<img src="${ph}" alt="">${tdot(c)}`:`<span class="tile-t">${esc(entryLabel(e))}</span><span class="tile-k">${ico(k.icon,14)}</span>`}</button>${cap?`<p class="cap">${cap}</p>`:''}</div>`;}
+function tile(e,cap){const pid=(e.photoIds||[]).find(id=>IMG.get(id));const ph=pid&&IMG.get(pid);const k=KINDS[e.kind]||KINDS.note;const c=entryColor(e);
+  return `<div class="tw"><button class="tile ${ph?'':'txt'}" style="--c:${c}" data-a="go" data-to="entry" data-p="${jp({id:e.id})}">${ph?`<img src="${ph}" alt="">${vbadge(pid)}${tdot(c)}`:`<span class="tile-t">${esc(entryLabel(e))}</span><span class="tile-k">${ico(k.icon,14)}</span>`}</button>${cap?`<p class="cap">${cap}</p>`:''}</div>`;}
 const lineRow=(e,showDate)=>`<button class="line" data-a="go" data-to="entry" data-p="${jp({id:e.id})}"><i class="dot" style="--c:${entryColor(e)}"></i><span class="line-t">${esc(entryLabel(e))}</span><span class="line-k">${esc(kindTag(e))}</span><time>${showDate?fmt.short(e.date)+' · ':''}${fmt.time(e.date)}</time></button>`;
 const threadCount=id=>all('entry').filter(e=>(e.threadIds||[]).includes(id)).length;
 function threadsByRelevance(){const last=new Map();all('entry').forEach(e=>(e.threadIds||[]).forEach(t=>{if((last.get(t)||0)<e.date)last.set(t,e.date);}));return all('thread').sort((a,b)=>(last.get(b.id)||b.createdAt||0)-(last.get(a.id)||a.createdAt||0));}
@@ -809,7 +841,7 @@ function timelineHTML(es){
     const photos=g.flatMap(e=>(e.photoIds||[]).filter(id=>IMG.get(id)).map(id=>({e,id})));
     const states=[...new Set(g.flatMap(e=>e.stateIds||[]))].map(get).filter(Boolean);
     const lines=g.filter(e=>!(e.kind==='state'&&!(e.text||'').trim()&&!(e.photoIds||[]).length));
-    h+=`<section class="day"><h3 class="day-t">${fmt.day(g[0].date)}</h3>${states.length?`<div class="chips sm">${states.map(stChip).join('')}</div>`:''}${photos.length?`<div class="grid3">${photos.map(p=>`<button class="tile" data-a="go" data-to="entry" data-p="${jp({id:p.e.id})}"><img src="${IMG.get(p.id)}" alt="" loading="lazy">${tdot(entryColor(p.e))}</button>`).join('')}</div>`:''}${lines.length?`<div class="lines">${lines.map(e=>lineRow(e)).join('')}</div>`:''}</section>`;}
+    h+=`<section class="day"><h3 class="day-t">${fmt.day(g[0].date)}</h3>${states.length?`<div class="chips sm">${states.map(stChip).join('')}</div>`:''}${photos.length?`<div class="grid3">${photos.map(p=>`<button class="tile" data-a="go" data-to="entry" data-p="${jp({id:p.e.id})}"><img src="${IMG.get(p.id)}" alt="" loading="lazy">${vbadge(p.id)}${tdot(entryColor(p.e))}</button>`).join('')}</div>`:''}${lines.length?`<div class="lines">${lines.map(e=>lineRow(e)).join('')}</div>`:''}</section>`;}
   return h;}
 function calendarHTML(es){
   const now=new Date();const base=MS.ym?new Date(MS.ym+'-01T12:00:00'):now;const y=base.getFullYear(),m=base.getMonth();
@@ -830,7 +862,7 @@ V.entry={html({id}){const e=get(id);if(!e)return head('Not found',{back:true});c
   const cats=(e.categoryIds||[]).map(get).filter(Boolean),sts=(e.stateIds||[]).map(get).filter(Boolean),ths=(e.threadIds||[]).map(get).filter(Boolean);
   const b=e.body;const rit=get(e.ritualId),it=get(e.intentionId);
   return `${head('',{back:true,right:`<button class="ibtn" data-a="editEntry" data-id="${e.id}" aria-label="Edit">${ico('edit',20)}</button>`})}
-  ${ph.length?`<div class="carousel">${ph.map((pid,i)=>`<div class="car-i ${ph.length===1?'solo':''}">${slot(pid,`item:${e.id}:photoIds:${i}`,'4/5')}</div>`).join('')}</div>`:''}
+  ${ph.length?`<div class="carousel">${ph.map((pid,i)=>`<div class="car-i ${ph.length===1?'solo':''}">${isVid(pid)?media(pid,'r45'):slot(pid,`item:${e.id}:photoIds:${i}`,'4/5')}</div>`).join('')}</div>`:''}
   <p class="eyebrow e-eb" style="--c:${entryColor(e)}"><i class="dot"></i>${esc(k.label)} · ${fmt.dayLong(e.date)} · ${fmt.time(e.date)}</p>
   ${b?`<p class="entry-text">${esc(b.sensation||'Observation')}${b.region?` · ${esc(placeName(b))}`:''}</p><p class="muted" style="margin-top:-8px">Intensity ${b.intensity||'–'} of 5${b.view==='back'?' · back':''}</p>`:''}
   ${rit?`<button class="row card" data-a="go" data-to="ritual" data-p="${jp({id:rit.id})}" style="margin:10px 0"><span class="row-i">${ico('ritual',18)}</span><span class="row-m"><span class="row-t">${esc(rit.name)}</span><span class="row-s">${esc(rit.purpose||'')}</span></span>${ico('chev',16)}</button>`:''}
@@ -984,7 +1016,7 @@ function archItems(){const out=[];
 function archResults(){let it=archItems();const f=AS.filter;
   if(f==='photos')it=it.filter(x=>x.e&&x.img);else if(f.startsWith('cat:'))it=it.filter(x=>(x.cats||[]).includes(f.slice(4)));else if(f!=='all')it=it.filter(x=>x.g===f);
   const q=AS.q.trim().toLowerCase();if(q)it=it.filter(x=>(x.text||'').toLowerCase().includes(q));
-  const tiles=it.map(x=>{const u=x.img&&IMG.get(x.img);const c=x.e?x.color:'';return `<button class="tile ${x.sig?'sig':''} ${c&&!u?'txt':''}" ${c?`style="--c:${c}"`:''} data-a="go" data-to="${x.to}" data-p="${jp({id:x.id})}" aria-label="${esc(x.title)}">${u?`<img src="${u}" alt="" loading="lazy">${c?tdot(c):''}`:`<span class="tile-t">${esc(x.title)}</span>${x.sub?`<span class="tile-s">${esc(x.sub)}</span>`:`<span class="tile-k">${ico(x.icon||'note',14)}</span>`}`}</button>`;});
+  const tiles=it.map(x=>{const u=x.img&&IMG.get(x.img);const c=x.e?x.color:'';return `<button class="tile ${x.sig?'sig':''} ${c&&!u?'txt':''}" ${c?`style="--c:${c}"`:''} data-a="go" data-to="${x.to}" data-p="${jp({id:x.id})}" aria-label="${esc(x.title)}">${u?`<img src="${u}" alt="" loading="lazy">${vbadge(x.img)}${c?tdot(c):''}`:`<span class="tile-t">${esc(x.title)}</span>${x.sub?`<span class="tile-s">${esc(x.sub)}</span>`:`<span class="tile-k">${ico(x.icon||'note',14)}</span>`}`}</button>`;});
   if(!q&&f==='all')tiles.unshift(`<button class="tile add" data-a="radial" aria-label="Add">${ico('plus',22)}</button>`);
   return tiles.length?`<div class="grid3">${tiles.join('')}</div>`:`<p class="empty">${q?'Nothing matches that search.':'Nothing here yet.'}</p>`;}
 V.archive={html(){const top=`${head('Archive',{right:`<button class="ibtn" data-a="go" data-to="threads" aria-label="Threads">${ico('threads')}</button>`})}<p class="hint">What actually happened.</p>
@@ -1042,7 +1074,7 @@ function needList(r,{interactive=true}={}){const objs=r.objects||[],prods=r.prod
   const ck=(k,i,on)=>interactive?`<button class="ck ${on?'on':''}" data-a="togHave" data-id="${r.id}" data-k="${k}" data-i="${i}" aria-label="${on?'Ready':'Not ready yet'}">${on?ico('check',14):''}</button>`:'';
   return `<div class="list card need">${objs.map((o,i)=>`<div class="row ${o.have?'have':''}">${ck('objects',i,o.have)}<span class="row-m"><span class="row-t">${esc(o.name)}</span></span></div>`).join('')}
    ${prods.map((p,i)=>`<div class="row ${p.have?'have':''}">${ck('products',i,p.have)}<button class="row-m btn-plain prod-r" data-a="go" data-to="product" data-p="${jp({id:r.id,pid:p.id})}"><span class="pthumb">${imgTag(p.imageId)||ico('bag',18)}</span><span class="row-m"><span class="row-t">${esc(p.name||'Product')}</span>${p.price||p.notes?`<span class="row-s">${esc([p.price,p.notes].filter(Boolean).join(' · '))}</span>`:''}</span></button>${p.url?`<a class="ibtn sm" href="${esc(p.url)}" target="_blank" rel="noopener" aria-label="Open link">${ico('link',16)}</a>`:''}</div>`).join('')}</div>`;}
-function stepBadges(s,r){const b=[];if(s.imageId&&IMG.get(s.imageId))b.push(`<span class="bdg img">${imgTag(s.imageId)}</span>`);
+function stepBadges(s,r){const b=[];if(s.imageId&&IMG.get(s.imageId))b.push(`<span class="bdg img">${imgTag(s.imageId)}</span>`);if(isVid(s.imageId))b.push(`<span class="bdg">${ico('play',12)}Video</span>`);
   if(s.duration)b.push(`<span class="bdg">${ico('clock',12)}${esc(s.duration)}</span>`);
   const pr=(r.products||[]).find(p=>p.id===s.productId);if(pr)b.push(`<span class="bdg">${ico('bag',12)}${esc(pr.name||'Product')}</span>`);
   const py=get(s.prayerId);if(py)b.push(`<span class="bdg">${ico('prayer',12)}${esc(py.name)}</span>`);
@@ -1059,7 +1091,7 @@ V.ritual={quiet:true,html({id}){const r=get(id);if(!r)return head('Not found',{b
   ${r.sample?`<p class="fine" style="text-align:left;margin:10px 0 0">An example. Edit it freely, or write your own.</p>`:''}
   <div class="obj-act"><button class="btn" data-a="go" data-to="run" data-p="${jp({id,i:-1})}" ${steps.length?'':'disabled'}>${ico('play',16)} Begin ritual</button><button class="btn ghost" data-a="keepTonight" data-kind="ritual" data-id="${id}">${ico('intention',16)} ${isTonight('ritual',id)?'Kept for tonight':'Keep for tonight'}</button></div>
   ${(r.objects||[]).length||(r.products||[]).length?`<div class="sec-h mt"><h2 class="sec-t">Things to prepare</h2></div>${needList(r)}`:''}
-  ${vis.length?`<div class="sec-h mt"><h2 class="sec-t">Visual references</h2></div><div class="grid3">${vis.map(v=>`<div class="tile"><img src="${IMG.get(v)}" alt=""></div>`).join('')}</div>`:''}
+  ${vis.length?`<div class="sec-h mt"><h2 class="sec-t">Visual references</h2></div><div class="grid3">${vis.map(v=>isVid(v)?`<button class="tile" data-a="playVid" data-id="${v}" aria-label="Play video"><img src="${IMG.get(v)}" alt="">${vbadge(v)}</button>`:`<div class="tile"><img src="${IMG.get(v)}" alt=""></div>`).join('')}</div>`:''}
   <div class="sec-h mt"><h2 class="sec-t">The ritual</h2>${r.duration?`<span class="muted" style="font-size:13px">${esc(r.duration)}</span>`:''}</div>
   ${steps.length?`<ol class="rit-steps">${steps.map(s=>`<li><span>${esc(s.text)}${stepBadges(s,r)}</span></li>`).join('')}</ol>`:`<button class="empty-cta" data-a="editRitual" data-id="${id}">No steps yet. Tap to write the sequence.</button>`}
   ${prs.length?`<div class="sec-h mt"><h2 class="sec-t">Prayers</h2></div><div class="list card">${prs.map(prayerRow).join('')}</div>`:''}
@@ -1068,7 +1100,7 @@ V.ritual={quiet:true,html({id}){const r=get(id);if(!r)return head('Not found',{b
   <div class="sec-h mt"><h2 class="sec-t">Times you did it</h2><button class="lnk" data-a="ritualDone" data-id="${id}">Record without guiding</button></div>
   ${done.length?`<div class="lines">${done.slice(0,10).map(e=>lineRow(e,true)).join('')}</div>`:`<p class="empty">Not yet.</p>`}`;}};
 V.product={html({id,pid}){const r=get(id);const p=r&&(r.products||[]).find(x=>x.id===pid);if(!p)return head('Not found',{back:true});
-  return `${head('',{back:true})}${IMG.get(p.imageId)?`<div class="prod-img"><div class="tile">${imgTag(p.imageId)}</div></div>`:''}
+  return `${head('',{back:true})}${IMG.get(p.imageId)?`<div class="prod-img">${isVid(p.imageId)?media(p.imageId,'r11'):`<div class="tile">${imgTag(p.imageId)}</div>`}</div>`:''}
   <h1 class="obj-name">${esc(p.name||'Product')}</h1>${p.price?`<p class="muted" style="margin:0 0 10px">${esc(p.price)}</p>`:''}
   ${p.notes?`<p class="obj-int">${esc(p.notes)}</p>`:''}
   ${p.url?`<a class="btn ghost mt" href="${esc(p.url)}" target="_blank" rel="noopener">${ico('link',16)} Open link</a>`:''}
@@ -1107,7 +1139,7 @@ function autoGrow(t){const f=()=>{t.style.height='auto';t.style.height=t.scrollH
 V.stepEdit={nav:false,html({draft:d,i}){const s=(d.steps||[])[i];if(!s)return head('',{back:true});const pr=(d.products||[]).find(p=>p.id===s.productId),py=get(s.prayerId);
   return `<header class="ed-hd"><span style="width:60px"></span><span class="ed-t">Step ${i+1}</span><button class="tbtn strong" data-a="back">Done</button></header>
   <textarea class="field area sm" id="se-text" data-bind="steps.${i}.text" placeholder="What happens in this step?">${esc(s.text)}</textarea>
-  <span class="lbl">Image</span>${slot(s.imageId,`dpath:steps.${i}.imageId`,'4/3',s.imageId?'':'compact')}
+  <span class="lbl">Image or video</span>${slot(s.imageId,`dpath:steps.${i}.imageId`,'4/3',s.imageId?'':'compact')}
   <span class="lbl">Note</span><textarea class="field area sm" id="se-note" data-bind="steps.${i}.note" placeholder="Anything to remember while doing it">${esc(s.note||'')}</textarea>
   <div class="pair"><div><span class="lbl">Duration</span><input class="field" id="se-dur" data-bind="steps.${i}.duration" value="${esc(s.duration||'')}" placeholder="e.g. 5 min"></div><div><span class="lbl">Sound or music</span><input class="field" id="se-snd" data-bind="steps.${i}.sound" value="${esc(s.sound||'')}" placeholder="Song or link"></div></div>
   <div class="list card mt">
@@ -1138,7 +1170,7 @@ V.run={nav:false,html(p){const r=get(p.id);if(!r)return head('Not found',{back:t
     <div class="run-foot"><button class="btn" data-a="runSave">Save to archive</button><button class="tbtn" data-a="runClose">Close without saving</button></div></div>`;
   const s=steps[i];const pr=(r.products||[]).find(x=>x.id===s.productId),py=get(s.prayerId);const mins=parseMinutes(s.duration);const url=/^https?:\/\//i.test(s.sound||'');
   return `<div class="run">${top}<div class="run-body">
-   ${s.imageId&&IMG.get(s.imageId)?`<div class="run-img">${imgTag(s.imageId)}</div>`:''}
+   ${s.imageId&&IMG.get(s.imageId)?`<div class="run-img">${media(s.imageId)}</div>`:''}
    <h1 class="run-step">${esc(s.text)}</h1>
    ${s.note?`<p class="obj-int">${esc(s.note)}</p>`:''}
    ${pr?`<div class="list card mt"><div class="row"><span class="pthumb">${imgTag(pr.imageId)||ico('bag',18)}</span><span class="row-m"><span class="row-t">${esc(pr.name||'Product')}</span>${pr.notes?`<span class="row-s">${esc(pr.notes)}</span>`:''}</span></div></div>`:''}
@@ -1162,7 +1194,7 @@ V.prayers={html(){const ps=all('prayer').sort(byUse);const sits=[...new Set(ps.f
   <button class="empty-cta mt" data-a="new" data-t="prayer">${ico('plus',16)} Write words for a moment you know will come again</button>`;}};
 V.prayer={quiet:true,html({id}){const p=get(id);if(!p)return head('Not found',{back:true});const rs=ritualsWith(id);
   return `${head('',{back:true,right:`<button class="ibtn ${p.favourite?'fav':''}" data-a="togFav" data-id="${id}" aria-label="${p.favourite?'Remove from favourites':'Add to favourites'}" aria-pressed="${!!p.favourite}">${ico('star',20)}</button><button class="ibtn" data-a="editPrayer" data-id="${id}" aria-label="Edit prayer">${ico('edit',20)}</button>`})}
-  ${IMG.get(p.imageId)?`<div class="pray-img">${slot(p.imageId,`item:${id}:imageId`,'4/3')}</div>`:''}
+  ${IMG.get(p.imageId)?`<div class="pray-img">${isVid(p.imageId)?media(p.imageId,'r43'):slot(p.imageId,`item:${id}:imageId`,'4/3')}</div>`:''}
   <h1 class="obj-name" ${p.color?`style="--c:${p.color}"`:''}>${esc(p.name)}</h1>
   ${(p.situations||[]).length?`<p class="eyebrow">When</p>${sitChips(p)}`:''}
   <div class="pray-text">${esc(p.text||'')}</div>
@@ -1175,7 +1207,7 @@ V.prayerEdit={nav:false,html({draft:d}){const isNew=!S.items.has(d.id);const rs=
   <input class="field title-in" id="p-name" data-bind="name" value="${esc(d.name||'')}" placeholder="Name it, e.g. Read this when I feel unwanted" autocomplete="off">
   <span class="lbl">When</span>${situationPicker(d)}
   <span class="lbl">Prayer</span><textarea class="field area pray-in" id="p-text" data-bind="text" placeholder="Your own words">${esc(d.text||'')}</textarea>
-  <span class="lbl">Image</span>${slot(d.imageId,'draft:imageId','4/3',d.imageId?'':'compact')}
+  <span class="lbl">Image or video</span>${slot(d.imageId,'draft:imageId','4/3',d.imageId?'':'compact')}
   <span class="lbl">Colour</span>${entryColorPicker(d)}
   <span class="lbl">Part of rituals</span>${rs.length?`<div class="list card">${rs.map(r=>`<div class="row"><span class="row-i">${ico('ritual',18)}</span><span class="row-m">${esc(r.name)}</span></div>`).join('')}</div>`:''}
   <button class="addl" data-a="prayerRituals">${ico('plus',16)} ${rs.length?'Change rituals':'Attach to a ritual'}</button>
@@ -1460,9 +1492,10 @@ const A={
     else if(a==='ritual')openEntry('ritual');else if(a==='sign')openEntry('sign',{intentionId:S.settings.currentIntentionId||null});
     else if(a==='entry:photo')openEntry('photo',{},true);else if(a.startsWith('entry:'))openEntry(a.slice(6));
     else if(a.startsWith('cat:'))openEntry('note',{categoryIds:[a.slice(4)]});},
+  playVid:t=>playVideo(t.dataset.id),
   slot:t=>{const ref=parseRef(t.dataset.ref),id=ref.get(),ratio=t.dataset.ratio||'1/1';
     if(!id||!IMG.get(id))return pickImage(ratio,nid=>ref.set(nid));
-    sheet([{label:'Replace image',fn:()=>pickImage(ratio,async nid=>{const old=ref.get();await ref.set(nid);ref.drop(old);})},{label:'Crop',fn:()=>recrop(id,ratio)},...(ref.coverable?[{label:'Set as cover',fn:()=>ref.makeCover()}]:[]),{label:'Remove image',danger:true,fn:async()=>{await ref.set(null);ref.drop(id);}}]);},
+    const v=isVid(id);sheet([...(v?[{label:'Play video',fn:()=>playVideo(id)}]:[]),{label:v?'Replace video':'Replace image',fn:()=>pickImage(ratio,async nid=>{const old=ref.get();await ref.set(nid);ref.drop(old);})},...(v?[]:[{label:'Crop',fn:()=>recrop(id,ratio)}]),...(ref.coverable?[{label:'Set as cover',fn:()=>ref.makeCover()}]:[]),{label:v?'Remove video':'Remove image',danger:true,fn:async()=>{await ref.set(null);ref.drop(id);}}]);},
   editHero:()=>inputSheet('Words for your Home',S.settings.heroText,async v=>{S.settings.heroText=v;await saveSettings();render();},{ph:'My body is asking for a quieter day.',multiline:true}),
   logState:async t=>{const id=t.dataset.id;const k=dkey(Date.now());const ex=all('entry').find(e=>e.kind==='state'&&dkey(e.date)===k&&(e.stateIds||[]).includes(id)&&!(e.text||'').trim());
     if(ex){if(ex.stateIds.length>1){ex.stateIds=ex.stateIds.filter(s=>s!==id);await save(ex);}else await removeItem(ex.id);}else await save(newEntryDraft('state',{stateIds:[id]}));render();},
@@ -1572,7 +1605,7 @@ const A={
   needKind:t=>{const p=cur().params;p.kind=t.dataset.v;p.m=null;render();},
   needMoment:t=>{const p=cur().params;p.m=p.m===t.dataset.v?null:t.dataset.v;render();},
   prepareFor:t=>{const v=t.dataset.v;const sit=v?{situations:[v]}:{};t.dataset.kind==='prayer'?NEW.prayer(sit):NEW.ritual(sit);},
-  recordSheet:()=>sheet([{label:'A note',fn:()=>openEntry('note')},{label:'A photo',fn:()=>openEntry('photo',{},true)},{label:'Something in my body',fn:()=>newBody()},{label:'How I feel',fn:()=>stateLogSheet()}],'Record something'),
+  recordSheet:()=>sheet([{label:'A note',fn:()=>openEntry('note')},{label:'A photo or video',fn:()=>openEntry('photo',{},true)},{label:'Something in my body',fn:()=>newBody()},{label:'How I feel',fn:()=>stateLogSheet()}],'Record something'),
   addListItem:t=>{const d=draft(),f=t.dataset.f;d[f]=d[f]||[];d[f].push(t.dataset.obj?{text:'',done:false}:'');render();const ins=$$(`[data-bind^="${f}."]`);const last=ins[ins.length-1];if(last)last.focus();},
   delListItem:t=>{const d=draft();d[t.dataset.f].splice(+t.dataset.i,1);render();},
   editIntention:t=>go('intentionEdit',{draft:clone(get(t.dataset.id))}),
@@ -1623,7 +1656,7 @@ function migrateSettings(s){const d=defaultSettings();const ver=s.v||1;for(const
 function applyTheme(){const s=S.settings,r=document.documentElement;r.style.setProperty('--accent',s.accent);r.style.setProperty('--accent-ink',lum(s.accent)>.42?'#0b0b0c':'#fbfbfb');r.dataset.cards=s.cards;r.dataset.corners=s.corners;}
 function buildNav(){$('#nav').innerHTML=[['home','Home','home'],['rituals','Rituals','ritual'],null,['prayers','Prayers','prayer'],['archive','Archive','archive']].map(x=>x?`<button class="nb" data-a="tab" data-t="${x[0]}">${ico(x[2],22)}<span>${x[1]}</span></button>`:`<button class="nb plus" data-a="radial" aria-label="Add"><span class="pc">${ico('plus',26)}</span></button>`).join('');}
 async function init(){
-  buildNav();fileIn=document.createElement('input');fileIn.type='file';fileIn.accept='image/*';fileIn.hidden=true;fileIn.addEventListener('change',onFile);document.body.append(fileIn);
+  buildNav();fileIn=document.createElement('input');fileIn.type='file';fileIn.accept='image/*,video/*';fileIn.hidden=true;fileIn.addEventListener('change',onFile);document.body.append(fileIn);
   document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const f=A[t.dataset.a];if(f){e.preventDefault();f(t,e);}});
   document.addEventListener('input',e=>{const el=e.target;
     if(el.dataset.bind){const d=draft();if(!d)return;let v=el.value;if(el.type==='datetime-local'){const n=new Date(v).getTime();if(isNaN(n))return;v=n;}setPath(d,el.dataset.bind,v);if(el.dataset.bind==='color')$$('.sw').forEach(s=>s.classList.remove('on'));}
